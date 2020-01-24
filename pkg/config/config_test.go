@@ -26,7 +26,7 @@ func TestLoad(t *testing.T) {
 	assert.NotNil(t, got)
 
 	assert.Equal(t, got.VarsFiles, []string{"testdata/testmodule/test.tfvars"})
-	assert.Equal(t, got.Vars, map[string]string{"foo": "foovalue", "templatedVar": "paramvalue"})
+	assert.Equal(t, got.Vars, map[string]string{"foo": "foovalue", "templatedVar": "paramvalue", "mapvar": "{\n  value1 = \"testvalue\"\n  value2 = true\n}"})
 	assert.Equal(t, got.Envs, map[string]string{"BAR": "barvalue", "TEMPLATED_ENV": "paramvalue"})
 	assert.Equal(t, got.BackendConfigs, map[string]string{
 		"backend_key":                  "be_key_foovalue_barvalue",

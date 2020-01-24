@@ -6,12 +6,18 @@ variable "foo" {}
 
 variable "baz" {}
 
+variable "mapvar" {}
+
 output "foo" {
   value = var.foo
 }
 
 output "baz" {
   value = var.baz
+}
+
+output "mapvar" {
+  value   = var.mapvar
 }
 
 resource "null_resource" "echo" {

@@ -3,6 +3,11 @@ varsFiles:
 vars:
   foo: foovalue
   templatedVar: "{{ .Params.param }}"
+  mapvar: |-
+    {
+      value1 = "testvalue"
+      value2 = true
+    }
 envs:
   BAR: barvalue
   TEMPLATED_ENV: "{{ .Params.param }}"

@@ -82,6 +82,7 @@ func Load(configFile string, params map[string]string) (*Config, error) {
 		}
 		cfg.BackendConfigs[key] = sb.String()
 	}
+
 	return cfg, nil
 }
 

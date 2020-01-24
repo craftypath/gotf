@@ -47,6 +47,17 @@ vars:
   # TF_VAR_<var>=value for commands that support them
   foo: foovalue
   templatedVar: "{{ .Params.param }}"
+  mapvar: |-
+    {
+      entry1 = {
+        value1 = testvalue1
+        value2 = true
+      }
+      entry2 = {
+        value1 = testvalue2
+        value2 = false
+      }
+    }
 envs:
   # Environment variables are added to the Terraform calls environment
   BAR: barvalue
@@ -88,6 +99,17 @@ vars:
   # TF_VAR_<var>=value for commands that support them
   foo: foovalue
   templatedVar: "myval"
+  mapvar: |-
+    {
+      entry1 = {
+        value1 = testvalue1
+        value2 = true
+      }
+      entry2 = {
+        value1 = testvalue2
+        value2 = false
+      }
+    }
 envs:
   # Environment variables are added to the Terraform calls environment
   BAR: barvalue

@@ -1,8 +1,19 @@
 varsFiles:
   - testmodule/test.tfvars
 vars:
-  foo: foovalue
+  foo: 42
+  mapvar: |-
+    {
+      entry1 = {
+        value1 = testvalue1
+        value2 = true
+      }
+      entry2 = {
+        value1 = testvalue2
+        value2 = false
+      }
+    }
 envs:
-  bar: barvalue
+  BAR: barvalue
 backendConfigs:
   path: testdata/.tfstate/terraform.tfstate

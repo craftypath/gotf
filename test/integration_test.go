@@ -17,7 +17,6 @@ package integrationtest
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -38,34 +37,44 @@ func Test_e2e(t *testing.T) {
 
 	binary := buildBinary(tempDir)
 
-	output, err := runProcess(binary, "-c", "testdata/test_config.yaml", "init", "-no-color", "testdata/testmodule")
+	output, err := runProcess(binary, "-d", "-c", "testdata/test_config.yaml", "init", "-no-color", "testdata/testmodule")
 	fmt.Println(output)
 	assert.NoError(t, err)
 	assert.Contains(t, output, "Terraform has been successfully initialized!")
 
-	output, err = runProcess(binary, "-c", "testdata/test_config.yaml", "plan", "-no-color", "testdata/testmodule")
+	output, err = runProcess(binary, "-d", "-c", "testdata/test_config.yaml", "plan", "-no-color", "testdata/testmodule")
 	fmt.Println(output)
 	assert.NoError(t, err)
 	assert.Contains(t, output, "# null_resource.echo will be created")
 	assert.Contains(t, output, "Plan: 1 to add, 0 to change, 0 to destroy.")
 
-	output, err = runProcess(binary, "-c", "testdata/test_config.yaml", "apply", "-auto-approve", "-no-color", "testdata/testmodule")
+	output, err = runProcess(binary, "-d", "-c", "testdata/test_config.yaml", "apply", "-auto-approve", "-no-color", "testdata/testmodule")
 	fmt.Println(output)
 	assert.NoError(t, err)
-	assert.Contains(t, output, "baz = bazvalue")
-	assert.Contains(t, output, "foo = foovalue")
+	assert.Contains(t, output, `baz = bazvalue
+foo = 42
+mapvar = {
+  entry1 = {
+    value1 = testvalue1
+    value2 = true
+  }
+  entry2 = {
+    value1 = testvalue2
+    value2 = false
+  }
+}`)
 }
 
 func buildBinary(dir string) string {
-	log.Println("Building application...")
+	fmt.Println("Building application...")
 	binary := filepath.Join(dir, "gotf")
 	output, err := runProcess("go", "build", "-o", binary, "..")
 	if err != nil {
-		log.Println(output)
+		fmt.Println(output)
 		panic(err)
 	}
-	log.Println("Build finished successfully")
-	log.Printf("Using binary for test: %v\n", binary)
+	fmt.Println("Build finished successfully")
+	fmt.Printf("Using binary for test: %v\n\n", binary)
 	return binary
 }
 
