@@ -98,5 +98,5 @@ backendConfigs:
   backend_key: be_key_foovalue_barvalue_myval_mysuffix
   backend_storage_account_name: be_storage_account_name_foovalue_barvalue
   backend_resource_group_name: be_resource_group_name_foovalue_barvalue
-  backend_container_name: be_container_name_foovalue_{{ .Envs.BAR }}
+  backend_container_name: be_container_name_foovalue_barvalue
 ```
