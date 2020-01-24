@@ -36,6 +36,7 @@ var (
 func Execute() {
 	var cfgFile string
 	params := opts.NewMapOpts()
+	var debug bool
 
 	cmd := &cobra.Command{
 		Use:     "gotf [flags] [Terraform args]",
@@ -48,12 +49,13 @@ func Execute() {
 			return nil
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			Run(cfgFile, params.GetAll(), args...)
+			Run(debug, cfgFile, params.GetAll(), args...)
 		},
 	}
 
 	cmd.Flags().StringVarP(&cfgFile, "config", "c", "gotf.yaml", "Config file to be used")
 	cmd.Flags().VarP(params, "params", "p", "Params for templating in the config file. May be specified multiple times")
+	cmd.Flags().BoolVarP(&debug, "debug", "d", false, "Print additional debug output")
 	cmd.Flags().SetInterspersed(false)
 	cmd.SetVersionTemplate("{{ .Version }}")
 
@@ -62,10 +64,10 @@ func Execute() {
 	}
 }
 
-func Run(cfgFile string, params map[string]string, args ...string) {
+func Run(debug bool, cfgFile string, params map[string]string, args ...string) {
 	cfg, err := config.Load(cfgFile, params)
 
-	shell := sh.Shell{}
+	shell := sh.NewShell(debug)
 	tf := terraform.NewTerraform(cfg, params, shell)
 	exitCode, err := tf.Run(args...)
 

@@ -15,18 +15,44 @@
 package sh
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 )
 
-type Shell struct{}
+type Shell struct {
+	debug bool
+}
+
+func NewShell(debug bool) Shell {
+	return Shell{debug: debug}
+}
 
 func (s Shell) Execute(env map[string]string, cmd string, args ...string) (int, error) {
 	c := exec.Command(cmd, args...)
 
 	c.Env = os.Environ()
+
+	if s.debug {
+		fmt.Println()
+		fmt.Println("Terraform command-line:")
+		fmt.Println("-----------------------")
+		fmt.Println(cmd, strings.Join(args, " "))
+		fmt.Println()
+		fmt.Println("Terraform environment:")
+		fmt.Println("----------------------")
+	}
+
 	for k, v := range env {
 		c.Env = append(c.Env, k+"="+v)
+		if s.debug {
+			fmt.Printf("%s=%s\n", k, v)
+		}
+	}
+
+	if s.debug {
+		fmt.Println()
 	}
 
 	c.Stderr = os.Stdout
