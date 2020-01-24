@@ -1,0 +1,27 @@
+builds:
+  - main: main.go
+    binary: gotf
+    env:
+      - CGO_ENABLED=0
+    goarch:
+      - amd64
+    goos:
+      - linux
+      - darwin
+      - windows
+    ldflags:
+      - >-
+        -X github.com/unguiculus/gotf/cmd/gotf.version={{ .Tag }}
+        -X github.com/unguiculus/gotf/cmd/gotf.gitCommit={{ .Commit }}
+        -X github.com/unguiculus/gotf/cmd/gotf.buildDate={{ .Date }}
+archives:
+  - format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - LICENSE
+      - README.md
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Tag }}-next"
