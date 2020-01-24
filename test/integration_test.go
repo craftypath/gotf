@@ -59,7 +59,7 @@ func Test_e2e(t *testing.T) {
 func buildBinary(dir string) string {
 	log.Println("Building application...")
 	binary := filepath.Join(dir, "gotf")
-	output, err := runProcess("go", "build", "-o", binary, "../cmd/gotf")
+	output, err := runProcess("go", "build", "-o", binary, "..")
 	if err != nil {
 		log.Println(output)
 		panic(err)
