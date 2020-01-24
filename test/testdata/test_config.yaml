@@ -1,4 +1,4 @@
-varsFiles:
+varFiles:
   - testmodule/test-{{ .Params.env }}.tfvars
 vars:
   foo: 42

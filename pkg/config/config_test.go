@@ -27,7 +27,7 @@ func TestLoad(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	assert.Equal(t, got.VarsFiles, []string{
+	assert.Equal(t, got.VarFiles, []string{
 		"testdata/testmodule/test1-prod.tfvars",
 		"testdata/testmodule/test2-prod.tfvars",
 	})

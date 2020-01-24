@@ -70,7 +70,7 @@ func (tf *Terraform) appendVarArgs(env map[string]string) {
 }
 
 func (tf *Terraform) appendVarFileArgs(sb *strings.Builder) {
-	for _, f := range tf.config.VarsFiles {
+	for _, f := range tf.config.VarFiles {
 		if sb.Len() > 0 {
 			sb.WriteString(" ")
 		}

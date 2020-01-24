@@ -1,4 +1,4 @@
-varsFiles:
+varFiles:
   - testmodule/test1-{{ .Params.env }}.tfvars
   - testmodule/test2-{{ .Params.env }}.tfvars
 vars:

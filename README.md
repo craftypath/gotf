@@ -38,7 +38,7 @@ By default, `gotf.yaml` is loaded from the current directory.
 ### Example
 
 ```yaml
-varsFiles:
+varFiles:
   # tfvars files are added to the Terraform environment via
   # TF_CLI_ARGS_<command>=-var-file=<file> for commands that support them
   - testmodule/test-{{ .Params.env }}.tfvars
@@ -75,7 +75,7 @@ backendConfigs:
 
 Go templating can be used in the config file as follows.
 
-* In the first templating pass, `varsFiles`, `vars`, and `envs` are processed.
+* In the first templating pass, `varFiles`, `vars`, and `envs` are processed.
   All parameters specified using the `-p|--param` flag are available in the `.Params` object.
 * In the second templating pass, `backendConfigs` are processed.
   `vars` are available as `.Vars`, `envs` are available as `.Envs` with the results from the first templating pass.
@@ -90,7 +90,7 @@ $ gotf -c example-config.yaml -p param=myval -p key_suffix=mysuffix init
 After processing, the config file would look like this:
 
 ```yaml
-varsFiles:
+varFiles:
   # tfvars files are added to the Terraform environment via
   # TF_CLI_ARGS_<command>=-var-file=<file> for commands that support them
   - testmodule/test-prod.tfvars

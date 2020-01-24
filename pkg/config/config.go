@@ -25,7 +25,7 @@ import (
 )
 
 type Config struct {
-	VarsFiles      []string          `yaml:"varsFiles"`
+	VarFiles      []string          `yaml:"varFiles"`
 	Vars           map[string]string `yaml:"vars"`
 	Envs           map[string]string `yaml:"envs"`
 	BackendConfigs map[string]string `yaml:"backendConfigs"`
@@ -47,7 +47,7 @@ func Load(configFile string, params map[string]string) (*Config, error) {
 	}
 
 	cfgFileDir := filepath.Dir(configFile)
-	for i, f := range cfg.VarsFiles {
+	for i, f := range cfg.VarFiles {
 		sb := strings.Builder{}
 		err := renderTemplate(&sb, templatingInput, f)
 		if err != nil {
@@ -57,7 +57,7 @@ func Load(configFile string, params map[string]string) (*Config, error) {
 		if !filepath.IsAbs(f) {
 			varFile = filepath.Join(cfgFileDir, varFile)
 		}
-		cfg.VarsFiles[i] = varFile
+		cfg.VarFiles[i] = varFile
 	}
 
 	for key, value := range cfg.Vars {
