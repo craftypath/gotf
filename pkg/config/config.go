@@ -72,6 +72,7 @@ func Load(configFile string, params map[string]string) (*Config, error) {
 	templatingInput = map[string]interface{}{
 		"Vars": cfg.Vars,
 		"Envs": cfg.Envs,
+		"Params": params,
 	}
 
 	for key, value := range cfg.BackendConfigs {
