@@ -1,0 +1,8 @@
+varsFiles:
+  - testmodule/test.tfvars
+vars:
+  foo: foovalue
+envs:
+  bar: barvalue
+backendConfigs:
+  path: testdata/.tfstate/terraform.tfstate
