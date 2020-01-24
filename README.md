@@ -1,6 +1,6 @@
 # gotf
 
-`gotf` is a Terraform wrapper thst makes it easy to support multiple configuration, e. g. for different environments.
+`gotf` is a Terraform wrapper that makes it easy to support multiple configurations, e. g. for different environments.
 
 ## Installation
 
@@ -39,7 +39,7 @@ Flags:
       --version            version for gotf
 ```
 
-`goft` is configured via a config file.
+`goft` is configured via config file.
 By default, `gotf.yaml` is loaded from the current directory.
 
 ### Example
