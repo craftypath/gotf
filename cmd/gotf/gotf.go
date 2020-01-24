@@ -66,7 +66,7 @@ gotf is a Terraform wrapper facilitating configurations for various environments
 	cmd.Flags().VarP(params, "params", "p", "Params for templating in the config file. May be specified multiple times")
 	cmd.Flags().BoolVarP(&debug, "debug", "d", false, "Print additional debug output")
 	cmd.Flags().SetInterspersed(false)
-	cmd.SetVersionTemplate("{{ .Version }}")
+	cmd.SetVersionTemplate("{{ .Version }}\n")
 
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
