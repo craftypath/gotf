@@ -41,7 +41,7 @@ func (o *MapOpts) String() string {
 }
 
 func (o *MapOpts) Type() string {
-	return "map"
+	return "key=value"
 }
 
 func NewMapOpts() *MapOpts {

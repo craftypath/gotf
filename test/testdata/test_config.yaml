@@ -1,5 +1,5 @@
 varsFiles:
-  - testmodule/test.tfvars
+  - testmodule/test-{{ .Params.env }}.tfvars
 vars:
   foo: 42
   mapvar: |-

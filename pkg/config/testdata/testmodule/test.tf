@@ -4,6 +4,8 @@ terraform {
 
 variable "foo" {}
 
+variable "bar" {}
+
 variable "baz" {}
 
 variable "mapvar" {

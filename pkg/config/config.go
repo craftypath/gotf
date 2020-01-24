@@ -42,16 +42,22 @@ func Load(configFile string, params map[string]string) (*Config, error) {
 		return nil, err
 	}
 
-	cfgFileDir := filepath.Dir(configFile)
-	for i, f := range cfg.VarsFiles {
-		if !filepath.IsAbs(f) {
-			varFile := filepath.Join(cfgFileDir, f)
-			cfg.VarsFiles[i] = varFile
-		}
-	}
-
 	templatingInput := map[string]interface{}{
 		"Params": params,
+	}
+
+	cfgFileDir := filepath.Dir(configFile)
+	for i, f := range cfg.VarsFiles {
+		sb := strings.Builder{}
+		err := renderTemplate(&sb, templatingInput, f)
+		if err != nil {
+			return nil, err
+		}
+		varFile := sb.String()
+		if !filepath.IsAbs(f) {
+			varFile = filepath.Join(cfgFileDir, varFile)
+		}
+		cfg.VarsFiles[i] = varFile
 	}
 
 	for key, value := range cfg.Vars {

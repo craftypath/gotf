@@ -1,5 +1,6 @@
 varsFiles:
-  - testmodule/test.tfvars
+  - testmodule/test1-{{ .Params.env }}.tfvars
+  - testmodule/test2-{{ .Params.env }}.tfvars
 vars:
   foo: foovalue
   templatedVar: "{{ .Params.param }}"

@@ -37,18 +37,18 @@ func Test_e2e(t *testing.T) {
 
 	binary := buildBinary(tempDir)
 
-	output, err := runProcess(binary, "-d", "-c", "testdata/test_config.yaml", "init", "-no-color", "testdata/testmodule")
+	output, err := runProcess(binary, "-d", "-c", "testdata/test_config.yaml", "-p", "env=prod", "init", "-no-color", "testdata/testmodule")
 	fmt.Println(output)
 	assert.NoError(t, err)
 	assert.Contains(t, output, "Terraform has been successfully initialized!")
 
-	output, err = runProcess(binary, "-d", "-c", "testdata/test_config.yaml", "plan", "-no-color", "testdata/testmodule")
+	output, err = runProcess(binary, "-d", "-c", "testdata/test_config.yaml", "-p", "env=prod", "plan", "-no-color", "testdata/testmodule")
 	fmt.Println(output)
 	assert.NoError(t, err)
 	assert.Contains(t, output, "# null_resource.echo will be created")
 	assert.Contains(t, output, "Plan: 1 to add, 0 to change, 0 to destroy.")
 
-	output, err = runProcess(binary, "-d", "-c", "testdata/test_config.yaml", "apply", "-auto-approve", "-no-color", "testdata/testmodule")
+	output, err = runProcess(binary, "-d", "-c", "testdata/test_config.yaml", "-p", "env=prod", "apply", "-auto-approve", "-no-color", "testdata/testmodule")
 	fmt.Println(output)
 	assert.NoError(t, err)
 	assert.Contains(t, output, `baz = bazvalue
