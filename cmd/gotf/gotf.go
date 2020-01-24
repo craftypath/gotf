@@ -30,7 +30,7 @@ import (
 var (
 	version = "dev"
 	gitCommit = "HEAD"
-	buildDate = "now"
+	buildDate = "unknown"
 )
 
 func Execute() {
@@ -38,10 +38,19 @@ func Execute() {
 	params := opts.NewMapOpts()
 	var debug bool
 
+	fullVersion := fmt.Sprintf("%s (commit=%s, date=%s)", version, gitCommit, buildDate)
 	cmd := &cobra.Command{
 		Use:     "gotf [flags] [Terraform args]",
 		Short:   "gotf is a Terraform wrapper facilitating configurations for various environments",
-		Version: fmt.Sprintf("%s (commit=%s, date=%s)", version, gitCommit, buildDate),
+		Long:   fmt.Sprintf(`
+  ___   __  ____  ____
+ / __) /  \(_  _)(  __)
+( (_ \(  O ) )(   ) _)
+ \___/ \__/ (__) (__)   %s
+
+gotf is a Terraform wrapper facilitating configurations for various environments
+`, fullVersion),
+		Version: fullVersion,
 		Args: func(cmd *cobra.Command, args []string) error {
 			if len(args) < 1 {
 				return errors.New("no arguments for Terraform specified")
