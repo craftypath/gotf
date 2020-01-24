@@ -21,15 +21,15 @@ import (
 )
 
 func TestLoad(t *testing.T) {
-	got, err := Load("testdata/test_config.yaml")
+	got, err := Load("testdata/test_config.yaml", map[string]string{"param": "paramvalue"})
 	assert.NoError(t, err)
 	assert.NotNil(t, got)
 
 	assert.Equal(t, got.VarsFiles, []string{"testdata/testmodule/test.tfvars"})
-	assert.Equal(t, got.Vars, map[string]string{"foo": "foovalue"})
-	assert.Equal(t, got.Envs, map[string]string{"bar": "barvalue"})
+	assert.Equal(t, got.Vars, map[string]string{"foo": "foovalue", "templatedVar": "paramvalue"})
+	assert.Equal(t, got.Envs, map[string]string{"BAR": "barvalue", "TEMPLATED_ENV": "paramvalue"})
 	assert.Equal(t, got.BackendConfigs, map[string]string{
-		"backend_key": "be_key_foovalue_barvalue",
+		"backend_key":                  "be_key_foovalue_barvalue",
 		"backend_storage_account_name": "be_storage_account_name_foovalue_barvalue",
 		"backend_resource_group_name":  "be_resource_group_name_foovalue_barvalue",
 		"backend_container_name":       "be_container_name_foovalue_barvalue",

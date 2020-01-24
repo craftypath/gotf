@@ -2,10 +2,12 @@ varsFiles:
   - testmodule/test.tfvars
 vars:
   foo: foovalue
+  templatedVar: "{{ .Params.param }}"
 envs:
-  bar: barvalue
+  BAR: barvalue
+  TEMPLATED_ENV: "{{ .Params.param }}"
 backendConfigs:
-  backend_key: be_key_{{ .Vars.foo }}_{{ .Envs.bar }}
-  backend_storage_account_name: be_storage_account_name_{{ .Vars.foo }}_{{ .Envs.bar }}
-  backend_resource_group_name: be_resource_group_name_{{ .Vars.foo }}_{{ .Envs.bar }}
-  backend_container_name: be_container_name_{{ .Vars.foo }}_{{ .Envs.bar }}
+  backend_key: be_key_{{ .Vars.foo }}_{{ .Envs.BAR }}
+  backend_storage_account_name: be_storage_account_name_{{ .Vars.foo }}_{{ .Envs.BAR }}
+  backend_resource_group_name: be_resource_group_name_{{ .Vars.foo }}_{{ .Envs.BAR }}
+  backend_container_name: be_container_name_{{ .Vars.foo }}_{{ .Envs.BAR }}

@@ -28,15 +28,17 @@ type (
 
 	Terraform struct {
 		config *config.Config
+		params map[string]string
 		shell  Shell
 	}
 )
 
 var commandsWithVars = []string{"apply", "destroy", "plan", "refresh", "import"}
 
-func NewTerraform(config *config.Config, shell Shell) *Terraform {
+func NewTerraform(config *config.Config, params map[string]string, shell Shell) *Terraform {
 	return &Terraform{
 		config: config,
+		params: params,
 		shell:  shell,
 	}
 }

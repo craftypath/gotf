@@ -31,7 +31,7 @@ type Config struct {
 	BackendConfigs map[string]string `yaml:"backendConfigs"`
 }
 
-func Load(configFile string) (*Config, error) {
+func Load(configFile string, params map[string]string) (*Config, error) {
 	cfgData, err := ioutil.ReadFile(configFile)
 	if err != nil {
 		return nil, err
@@ -49,7 +49,27 @@ func Load(configFile string) (*Config, error) {
 			cfg.VarsFiles[i] = varFile
 		}
 	}
+
 	templatingInput := map[string]interface{}{
+		"Params": params,
+	}
+
+	for key, value := range cfg.Vars {
+		sb := strings.Builder{}
+		if err := renderTemplate(&sb, templatingInput, value); err != nil {
+			return nil, err
+		}
+		cfg.Vars[key] = sb.String()
+	}
+	for key, value := range cfg.Envs {
+		sb := strings.Builder{}
+		if err := renderTemplate(&sb, templatingInput, value); err != nil {
+			return nil, err
+		}
+		cfg.Envs[key] = sb.String()
+	}
+
+	templatingInput = map[string]interface{}{
 		"Vars": cfg.Vars,
 		"Envs": cfg.Envs,
 	}
