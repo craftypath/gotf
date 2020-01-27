@@ -110,7 +110,7 @@ func load(cfgData []byte) (*Config, error) {
 }
 
 func renderTemplate(wr io.Writer, data map[string]interface{}, text string) error {
-	tpl := template.New("gotpl")
+	tpl := template.New("gotpl").Option("missingkey=error")
 	tpl, err := tpl.Parse(text)
 	if err != nil {
 		return err
