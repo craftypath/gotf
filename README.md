@@ -45,13 +45,18 @@ By default, `gotf.yaml` is loaded from the current directory.
 ### Example
 
 ```yaml
+# Optionally set a specific Terraform version. gotf will download this version and cache
+# it in $XDG_CACHE_HOME/gotf/terraform/<version> verifying GPG signature and SHA256 sum
+terraformVersion: 0.12.20
+
+# tfvars files are added to the Terraform environment via
+# TF_CLI_ARGS_<command>=-var-file=<file> for commands that support them
 varFiles:
-  # tfvars files are added to the Terraform environment via
-  # TF_CLI_ARGS_<command>=-var-file=<file> for commands that support them
   - testmodule/test-{{ .Params.env }}.tfvars
+
+# Variables are added to the Terraform environment via
+# TF_VAR_<var>=value for commands that support them
 vars:
-  # Variables are added to the Terraform environment via
-  # TF_VAR_<var>=value for commands that support them
   foo: foovalue
   templatedVar: "{{ .Params.param }}"
   mapvar: |-
@@ -65,13 +70,15 @@ vars:
         value2 = false
       }
     }
+
+# Environment variables are added to the Terraform calls environment
 envs:
-  # Environment variables are added to the Terraform calls environment
   BAR: barvalue
   TEMPLATED_ENV: "{{ .Params.param }}"
+
+# Backend configs are always added as variables (TF_VAR_<var>=value) for commands
+# that support them and, if in case of 'init' additionally as '-backend-config' CLI options
 backendConfigs:
-  # Backend configs are always added as variables (TF_VAR_<var>=value) for commands
-  # that support them and, if in case of 'init' additionally as '-backend-config' CLI options
   backend_key: be_key_{{ .Vars.foo }}_{{ .Envs.BAR }}_{{ .Vars.templatedVar }}_{{ .Params.key_suffix }}
   backend_storage_account_name: be_storage_account_name_{{ .Vars.foo }}_{{ .Envs.BAR }}
   backend_resource_group_name: be_resource_group_name_{{ .Vars.foo }}_{{ .Envs.BAR }}
@@ -97,13 +104,12 @@ $ gotf -c example-config.yaml -p param=myval -p key_suffix=mysuffix init
 After processing, the config file would look like this:
 
 ```yaml
+terraformVersion: 0.12.20
+
 varFiles:
-  # tfvars files are resolved relative to this file and are added to the Terraform environment via
-  # TF_CLI_ARGS_<command>=-var-file=<file> for commands that support them
   - testmodule/test-prod.tfvars
+
 vars:
-  # Variables are added to the Terraform environment via
-  # TF_VAR_<var>=value for commands that support them
   foo: foovalue
   templatedVar: "myval"
   mapvar: |-
@@ -117,13 +123,12 @@ vars:
         value2 = false
       }
     }
+
 envs:
-  # Environment variables are added to the Terraform calls environment
   BAR: barvalue
   TEMPLATED_ENV: "myval"
+
 backendConfigs:
-  # Backend configs are always added as variables (TF_VAR_<var>=value) for commands
-  # that support them and, if in case of 'init' additionally as '-backend-config' CLI options
   backend_key: be_key_foovalue_barvalue_myval_mysuffix
   backend_storage_account_name: be_storage_account_name_foovalue_barvalue
   backend_resource_group_name: be_resource_group_name_foovalue_barvalue
