@@ -39,7 +39,7 @@ Flags:
       --version            version for gotf
 ```
 
-`goft` is configured via config file.
+`gotf` is configured via config file.
 By default, `gotf.yaml` is loaded from the current directory.
 
 ### Example
