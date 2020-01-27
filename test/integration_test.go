@@ -36,20 +36,21 @@ func Test_e2e(t *testing.T) {
 	defer os.RemoveAll(tempDir)
 
 	binary := buildBinary(tempDir)
+	if err := os.MkdirAll(tempDir, os.ModePerm); err != nil {
+		panicOnError(err)
+	}
+	env := []string{"XDG_CACHE_HOME=" + filepath.Join(tempDir, "test")}
 
-	output, err := runProcess(binary, "-d", "-c", "testdata/test_config.yaml", "-p", "env=prod", "init", "-no-color", "testdata/testmodule")
-	fmt.Println(output)
+	output, err := runProcess(binary, env, "-d", "-c", "testdata/test_config.yaml", "-p", "env=prod", "init", "-no-color", "testdata/testmodule")
 	assert.NoError(t, err)
 	assert.Contains(t, output, "Terraform has been successfully initialized!")
 
-	output, err = runProcess(binary, "-d", "-c", "testdata/test_config.yaml", "-p", "env=prod", "plan", "-no-color", "testdata/testmodule")
-	fmt.Println(output)
+	output, err = runProcess(binary, env, "-d", "-c", "testdata/test_config.yaml", "-p", "env=prod", "plan", "-no-color", "testdata/testmodule")
 	assert.NoError(t, err)
 	assert.Contains(t, output, "# null_resource.echo will be created")
 	assert.Contains(t, output, "Plan: 1 to add, 0 to change, 0 to destroy.")
 
-	output, err = runProcess(binary, "-d", "-c", "testdata/test_config.yaml", "-p", "env=prod", "apply", "-auto-approve", "-no-color", "testdata/testmodule")
-	fmt.Println(output)
+	output, err = runProcess(binary, env, "-d", "-c", "testdata/test_config.yaml", "-p", "env=prod", "apply", "-auto-approve", "-no-color", "testdata/testmodule")
 	assert.NoError(t, err)
 	assert.Contains(t, output, `baz = bazvalue
 foo = 42
@@ -68,19 +69,23 @@ mapvar = {
 func buildBinary(dir string) string {
 	fmt.Println("Building application...")
 	binary := filepath.Join(dir, "gotf")
-	output, err := runProcess("go", "build", "-o", binary, "..")
+	env := []string{}
+	_, err := runProcess("go", env, "build", "-o", binary, "..")
 	if err != nil {
-		fmt.Println(output)
-		panic(err)
+		panicOnError(err)
 	}
 	fmt.Println("Build finished successfully")
 	fmt.Printf("Using binary for test: %v\n\n", binary)
 	return binary
 }
 
-func runProcess(binary string, files ...string) (string, error) {
-	output, err := exec.Command(binary, files...).CombinedOutput()
-	return strings.TrimSpace(string(output)), err
+func runProcess(binary string, env []string, args ...string) (string, error) {
+	command := exec.Command(binary, args...)
+	command.Env = append(os.Environ(), env...)
+	output, err := command.CombinedOutput()
+	s := strings.TrimSpace(string(output))
+	fmt.Println(s)
+	return s, err
 }
 
 func copyToDir(dst string, src string) {

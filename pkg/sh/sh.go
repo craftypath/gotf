@@ -15,7 +15,7 @@
 package sh
 
 import (
-	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"strings"
@@ -29,44 +29,31 @@ func NewShell(debug bool) Shell {
 	return Shell{debug: debug}
 }
 
-func (s Shell) Execute(env map[string]string, cmd string, args ...string) (int, error) {
+func (s Shell) Execute(env map[string]string, cmd string, args ...string) error {
 	c := exec.Command(cmd, args...)
 
 	c.Env = os.Environ()
 
 	if s.debug {
-		fmt.Println()
-		fmt.Println("Terraform command-line:")
-		fmt.Println("-----------------------")
-		fmt.Println(cmd, strings.Join(args, " "))
-		fmt.Println()
-		fmt.Println("Terraform environment:")
-		fmt.Println("----------------------")
+		log.Println()
+		log.Println("Terraform command-line:")
+		log.Println("-----------------------")
+		log.Println(cmd, strings.Join(args, " "))
+		log.Println()
+		log.Println("Terraform environment:")
+		log.Println("----------------------")
 	}
 
 	for k, v := range env {
 		c.Env = append(c.Env, k+"="+v)
 		if s.debug {
-			fmt.Printf("%s=%s\n", k, v)
+			log.Printf("%s=%s\n", k, v)
 		}
-	}
-
-	if s.debug {
-		fmt.Println()
 	}
 
 	c.Stderr = os.Stdout
 	c.Stdout = os.Stderr
 	c.Stdin = os.Stdin
 
-	err := c.Run()
-	if err == nil {
-		return 0, nil
-	}
-
-	if err, ok := err.(*exec.ExitError); ok {
-		return err.ExitCode(), err
-	}
-
-	return 1, err
+	return c.Run()
 }

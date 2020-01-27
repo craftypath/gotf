@@ -98,7 +98,7 @@ After processing, the config file would look like this:
 
 ```yaml
 varFiles:
-  # tfvars files are added to the Terraform environment via
+  # tfvars files are resolved relative to this file and are added to the Terraform environment via
   # TF_CLI_ARGS_<command>=-var-file=<file> for commands that support them
   - testmodule/test-prod.tfvars
 vars:

@@ -23,27 +23,29 @@ import (
 
 type (
 	Shell interface {
-		Execute(env map[string]string, cmd string, args ...string) (int, error)
+		Execute(env map[string]string, cmd string, args ...string) error
 	}
 
 	Terraform struct {
-		config *config.Config
-		params map[string]string
-		shell  Shell
+		config     *config.Config
+		params     map[string]string
+		shell      Shell
+		binaryPath string
 	}
 )
 
 var commandsWithVars = []string{"apply", "destroy", "plan", "refresh", "import"}
 
-func NewTerraform(config *config.Config, params map[string]string, shell Shell) *Terraform {
+func NewTerraform(config *config.Config, params map[string]string, shell Shell, binaryPath string) *Terraform {
 	return &Terraform{
-		config: config,
-		params: params,
-		shell:  shell,
+		config:     config,
+		params:     params,
+		shell:      shell,
+		binaryPath: binaryPath,
 	}
 }
 
-func (tf *Terraform) Run(args ...string) (int, error) {
+func (tf *Terraform) Execute(args ...string) error {
 	env := map[string]string{}
 	stringMapAppend(env, tf.config.Envs)
 
@@ -60,7 +62,7 @@ func (tf *Terraform) Run(args ...string) (int, error) {
 	tf.appendBackendConfigs(&sb, env)
 	env["TF_CLI_ARGS_init"] = sb.String()
 
-	return tf.shell.Execute(env, "terraform", args...)
+	return tf.shell.Execute(env, tf.binaryPath, args...)
 }
 
 func (tf *Terraform) appendVarArgs(env map[string]string) {

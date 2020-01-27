@@ -15,8 +15,10 @@
 package config
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"path/filepath"
 	"strings"
 	"text/template"
@@ -25,27 +27,30 @@ import (
 )
 
 type Config struct {
-	VarFiles      []string          `yaml:"varFiles"`
-	Vars           map[string]string `yaml:"vars"`
-	Envs           map[string]string `yaml:"envs"`
-	BackendConfigs map[string]string `yaml:"backendConfigs"`
+	TerraformVersion string            `yaml:"terraformVersion"`
+	VarFiles         []string          `yaml:"varFiles"`
+	Vars             map[string]string `yaml:"vars"`
+	Envs             map[string]string `yaml:"envs"`
+	BackendConfigs   map[string]string `yaml:"backendConfigs"`
 }
 
 func Load(configFile string, params map[string]string) (*Config, error) {
+	log.Println("Loading config file:", configFile)
 	cfgData, err := ioutil.ReadFile(configFile)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not load config file %q: %w", configFile, err)
 	}
 
 	cfg, err := load(cfgData)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not load config file %q: %w", configFile, err)
 	}
 
 	templatingInput := map[string]interface{}{
 		"Params": params,
 	}
 
+	log.Println("Processing varFiles...")
 	cfgFileDir := filepath.Dir(configFile)
 	for i, f := range cfg.VarFiles {
 		sb := strings.Builder{}
@@ -60,6 +65,7 @@ func Load(configFile string, params map[string]string) (*Config, error) {
 		cfg.VarFiles[i] = varFile
 	}
 
+	log.Println("Processing vars...")
 	for key, value := range cfg.Vars {
 		sb := strings.Builder{}
 		if err := renderTemplate(&sb, templatingInput, value); err != nil {
@@ -67,6 +73,8 @@ func Load(configFile string, params map[string]string) (*Config, error) {
 		}
 		cfg.Vars[key] = sb.String()
 	}
+
+	log.Println("Processing envs...")
 	for key, value := range cfg.Envs {
 		sb := strings.Builder{}
 		if err := renderTemplate(&sb, templatingInput, value); err != nil {
@@ -76,11 +84,12 @@ func Load(configFile string, params map[string]string) (*Config, error) {
 	}
 
 	templatingInput = map[string]interface{}{
-		"Vars": cfg.Vars,
-		"Envs": cfg.Envs,
+		"Vars":   cfg.Vars,
+		"Envs":   cfg.Envs,
 		"Params": params,
 	}
 
+	log.Println("Proessing backendConfigs...")
 	for key, value := range cfg.BackendConfigs {
 		sb := strings.Builder{}
 		if err := renderTemplate(&sb, templatingInput, value); err != nil {

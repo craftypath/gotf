@@ -11,9 +11,9 @@ builds:
       - windows
     ldflags:
       - >-
-        -X github.com/unguiculus/gotf/cmd/gotf.version={{ .Tag }}
-        -X github.com/unguiculus/gotf/cmd/gotf.gitCommit={{ .Commit }}
-        -X github.com/unguiculus/gotf/cmd/gotf.buildDate={{ .Date }}
+        -X github.com/unguiculus/gotf/pkg/cmd.Version={{ .Tag }}
+        -X github.com/unguiculus/gotf/pkg/cmd.GitCommit={{ .Commit }}
+        -X github.com/unguiculus/gotf/pkg/cmd.BuildDate={{ .Date }}
 archives:
   - format_overrides:
       - goos: windows

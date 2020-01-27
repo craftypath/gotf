@@ -18,19 +18,12 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"os/exec"
 
 	"github.com/spf13/cobra"
 
-	"github.com/unguiculus/gotf/pkg/config"
+	"github.com/unguiculus/gotf/pkg/cmd"
 	"github.com/unguiculus/gotf/pkg/opts"
-	"github.com/unguiculus/gotf/pkg/sh"
-	terraform "github.com/unguiculus/gotf/pkg/tf"
-)
-
-var (
-	version = "dev"
-	gitCommit = "HEAD"
-	buildDate = "unknown"
 )
 
 func Execute() {
@@ -38,11 +31,11 @@ func Execute() {
 	params := opts.NewMapOpts()
 	var debug bool
 
-	fullVersion := fmt.Sprintf("%s (commit=%s, date=%s)", version, gitCommit, buildDate)
-	cmd := &cobra.Command{
-		Use:     "gotf [flags] [Terraform args]",
-		Short:   "gotf is a Terraform wrapper facilitating configurations for various environments",
-		Long:   fmt.Sprintf(`
+	fullVersion := fmt.Sprintf("%s (commit=%s, date=%s)", cmd.Version, cmd.GitCommit, cmd.BuildDate)
+	command := &cobra.Command{
+		Use:   "gotf [flags] [Terraform args]",
+		Short: "gotf is a Terraform wrapper facilitating configurations for various environments",
+		Long: fmt.Sprintf(`
   ___   __  ____  ____
  / __) /  \(_  _)(  __)
 ( (_ \(  O ) )(   ) _)
@@ -57,31 +50,24 @@ gotf is a Terraform wrapper facilitating configurations for various environments
 			}
 			return nil
 		},
-		Run: func(cmd *cobra.Command, args []string) {
-			Run(debug, cfgFile, params.GetAll(), args...)
+		RunE: func(command *cobra.Command, args []string) error {
+			return cmd.Run(debug, cfgFile, params.GetAll(), args...)
 		},
 	}
 
-	cmd.Flags().StringVarP(&cfgFile, "config", "c", "gotf.yaml", "Config file to be used")
-	cmd.Flags().VarP(params, "params", "p", "Params for templating in the config file. May be specified multiple times")
-	cmd.Flags().BoolVarP(&debug, "debug", "d", false, "Print additional debug output")
-	cmd.Flags().SetInterspersed(false)
-	cmd.SetVersionTemplate("{{ .Version }}\n")
+	command.Flags().StringVarP(&cfgFile, "config", "c", "gotf.yaml", "Config file to be used")
+	command.Flags().VarP(params, "params", "p", "Params for templating in the config file. May be specified multiple times")
+	command.Flags().BoolVarP(&debug, "debug", "d", false, "Print additional debug output to stderr")
+	command.Flags().SetInterspersed(false)
+	command.SetVersionTemplate("{{ .Version }}\n")
 
-	if err := cmd.Execute(); err != nil {
-		os.Exit(1)
+	if err := command.Execute(); err != nil {
+		var exitCode int
+		if err, ok := err.(*exec.ExitError); ok {
+			exitCode = err.ExitCode()
+		} else {
+			exitCode = 1
+		}
+		os.Exit(exitCode)
 	}
-}
-
-func Run(debug bool, cfgFile string, params map[string]string, args ...string) {
-	cfg, err := config.Load(cfgFile, params)
-
-	shell := sh.NewShell(debug)
-	tf := terraform.NewTerraform(cfg, params, shell)
-	exitCode, err := tf.Run(args...)
-
-	if err != nil {
-		fmt.Println("\n", err)
-	}
-	os.Exit(exitCode)
 }
