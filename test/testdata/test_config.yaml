@@ -1,6 +1,6 @@
 terraformVersion: "0.12.20"
 varFiles:
-  - testmodule/test-{{ .Params.env }}.tfvars
+  - 01_testmodule/test-{{ .Params.env }}.tfvars
 vars:
   foo: 42
   mapvar: |-
@@ -14,6 +14,8 @@ vars:
         value2 = false
       }
     }
+  module_dir: "{{ base .Params.moduleDir }}"
+  state_key: '{{ regexSplit "\\d+_" (base .Params.moduleDir) 2 | last }}'
 envs:
   BAR: barvalue
 backendConfigs:

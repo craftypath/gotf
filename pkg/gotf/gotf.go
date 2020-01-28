@@ -15,6 +15,7 @@
 package gotf
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -70,12 +71,16 @@ oEIgXTMyCILo34Fa/C6VCm2WBgz9zZO8/rHIiQm1J5zqz0DrDwKBUM9C
 	}
 )
 
-func Run(debug bool, cfgFile string, args ...string) error {
-	return RunWithParams(debug, cfgFile, map[string]string{}, args...)
+type Args struct {
+	Debug bool
+	ConfigFile string
+	ModuleDir string
+	Params map[string]string
+	Args []string
 }
 
-func RunWithParams(debug bool, cfgFile string, params map[string]string, args ...string) error {
-	if debug {
+func Run(args Args) error {
+	if args.Debug {
 		log.SetOutput(os.Stderr)
 		log.SetFlags(0)
 		log.SetPrefix("gotf> ")
@@ -83,7 +88,16 @@ func RunWithParams(debug bool, cfgFile string, params map[string]string, args ..
 		log.SetOutput(ioutil.Discard)
 	}
 
-	cfg, err := config.Load(cfgFile, params)
+	params := make(map[string]string)
+	for k, v := range args.Params {
+		if k == "moduleDir" {
+			return fmt.Errorf("param 'module-dir' is reserved for internal use and set automatically")
+		}
+		params[k] = v
+	}
+	params["moduleDir"] = args.ModuleDir
+
+	cfg, err := config.Load(args.ConfigFile, params)
 	if err != nil {
 		return err
 	}
@@ -114,7 +128,7 @@ func RunWithParams(debug bool, cfgFile string, params map[string]string, args ..
 
 	log.Println("Terraform binary:", binary)
 
-	shell := sh.NewShell(debug)
-	tf := terraform.NewTerraform(cfg, params, shell, binary)
-	return tf.Execute(args...)
+	shell := sh.Shell{}
+	tf := terraform.NewTerraform(cfg, args.ModuleDir, args.Params, shell, binary)
+	return tf.Execute(args.Args...)
 }

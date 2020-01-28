@@ -30,6 +30,7 @@ func Execute() {
 	var cfgFile string
 	params := opts.NewMapOpts()
 	var debug bool
+	var moduleDir string
 
 	fullVersion := fmt.Sprintf("%s (commit=%s, date=%s)", gotf.Version, gotf.GitCommit, gotf.BuildDate)
 	command := &cobra.Command{
@@ -51,15 +52,23 @@ gotf is a Terraform wrapper facilitating configurations for various environments
 			return nil
 		},
 		RunE: func(command *cobra.Command, args []string) error {
-			return gotf.RunWithParams(debug, cfgFile, params.GetAll(), args...)
+			return gotf.Run(gotf.Args{
+				Debug:      debug,
+				ConfigFile: cfgFile,
+				ModuleDir:  moduleDir,
+				Params:     params.GetAll(),
+				Args:       args,
+			})
 		},
 	}
 
 	command.Flags().StringVarP(&cfgFile, "config", "c", "gotf.yaml", "Config file to be used")
 	command.Flags().VarP(params, "params", "p", "Params for templating in the config file. May be specified multiple times")
 	command.Flags().BoolVarP(&debug, "debug", "d", false, "Print additional debug output to stderr")
+	command.Flags().StringVarP(&moduleDir, "module-dir", "m", "", "The module directory to run Terraform in")
 	command.Flags().SetInterspersed(false)
 	command.SetVersionTemplate("{{ .Version }}\n")
+	command.MarkFlagRequired("module-dir")
 
 	if err := command.Execute(); err != nil {
 		var exitCode int

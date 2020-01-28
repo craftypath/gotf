@@ -23,6 +23,7 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/Masterminds/sprig/v3"
 	"gopkg.in/yaml.v2"
 )
 
@@ -110,7 +111,7 @@ func load(cfgData []byte) (*Config, error) {
 }
 
 func renderTemplate(wr io.Writer, data map[string]interface{}, text string) error {
-	tpl := template.New("gotpl").Option("missingkey=error")
+	tpl := template.New("gotpl").Funcs(sprig.TxtFuncMap()).Option("missingkey=error")
 	tpl, err := tpl.Parse(text)
 	if err != nil {
 		return err

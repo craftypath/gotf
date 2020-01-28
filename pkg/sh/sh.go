@@ -21,34 +21,23 @@ import (
 	"strings"
 )
 
-type Shell struct {
-	debug bool
-}
+type Shell struct{}
 
-func NewShell(debug bool) Shell {
-	return Shell{debug: debug}
-}
+func (s Shell) Execute(env map[string]string, workingDir string, cmd string, args ...string) error {
+	log.Println()
+	log.Println("Terraform command-line:")
+	log.Println("-----------------------")
+	log.Println(cmd, strings.Join(args, " "))
+	log.Println()
+	log.Println("Terraform environment:")
+	log.Println("----------------------")
 
-func (s Shell) Execute(env map[string]string, cmd string, args ...string) error {
 	c := exec.Command(cmd, args...)
-
+	c.Dir = workingDir
 	c.Env = os.Environ()
-
-	if s.debug {
-		log.Println()
-		log.Println("Terraform command-line:")
-		log.Println("-----------------------")
-		log.Println(cmd, strings.Join(args, " "))
-		log.Println()
-		log.Println("Terraform environment:")
-		log.Println("----------------------")
-	}
-
 	for k, v := range env {
 		c.Env = append(c.Env, k+"="+v)
-		if s.debug {
-			log.Printf("%s=%s\n", k, v)
-		}
+		log.Printf("%s=%s\n", k, v)
 	}
 
 	c.Stderr = os.Stdout
