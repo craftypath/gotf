@@ -40,8 +40,8 @@ func (s Shell) Execute(env map[string]string, workingDir string, cmd string, arg
 		log.Printf("%s=%s\n", k, v)
 	}
 
-	c.Stderr = os.Stdout
-	c.Stdout = os.Stderr
+	c.Stdout = os.Stdout
+	c.Stderr = os.Stderr
 	c.Stdin = os.Stdin
 
 	return c.Run()
