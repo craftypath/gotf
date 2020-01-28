@@ -84,7 +84,7 @@ func (tf *Terraform) appendVarFileArgs(sb *strings.Builder) {
 
 func (tf *Terraform) appendBackendConfigs(sb *strings.Builder, env map[string]string) {
 	for k, v := range tf.config.BackendConfigs {
-		env["TF_VAR_"+k] = v
+		env["TF_VAR_backend_"+k] = v
 		if sb.Len() > 0 {
 			sb.WriteString(" ")
 		}

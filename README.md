@@ -79,13 +79,14 @@ envs:
   BAR: barvalue
   TEMPLATED_ENV: "{{ .Params.param }}"
 
-# Backend configs are always added as variables (TF_VAR_<var>=value) for commands
-# that support them and, if in case of 'init' additionally as '-backend-config' CLI options
+# Backend configs are always added as variables (TF_VAR_backend_<var>=value) for commands
+# that support them and, if in case of 'init' additionally as '-backend-config' CLI options.
+# Note the prefix 'backend_'  in the variable names.
 backendConfigs:
-  backend_key: "{{ .Vars.state_key_prefix }}_{{ .Vars.templated_var }}_{{ .Params.key_suffix }}
-  backend_storage_account_name: be_storage_account_name_{{ .Vars.foo }}_{{ .Envs.BAR }}
-  backend_resource_group_name: be_resource_group_name_{{ .Vars.foo }}_{{ .Envs.BAR }}
-  backend_container_name: be_container_name_{{ .Vars.foo }}_{{ .Envs.BAR }}
+  key: "{{ .Vars.state_key_prefix }}_{{ .Vars.templated_var }}_{{ .Params.key_suffix }}
+  storage_account_name: be_storage_account_name_{{ .Vars.foo }}_{{ .Envs.BAR }}
+  resource_group_name: be_resource_group_name_{{ .Vars.foo }}_{{ .Envs.BAR }}
+  container_name: be_container_name_{{ .Vars.foo }}_{{ .Envs.BAR }}
 ```
 
 ## Templating
@@ -137,8 +138,8 @@ envs:
   TEMPLATED_ENV: "myval"
 
 backendConfigs:
-  backend_key: testmodule_myval_mysuffix
-  backend_storage_account_name: be_storage_account_name_foovalue_barvalue
-  backend_resource_group_name: be_resource_group_name_foovalue_barvalue
-  backend_container_name: be_container_name_foovalue_barvalue
+  key: testmodule_myval_mysuffix
+  storage_account_name: be_storage_account_name_foovalue_barvalue
+  resource_group_name: be_resource_group_name_foovalue_barvalue
+  container_name: be_container_name_foovalue_barvalue
 ```
