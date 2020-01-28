@@ -26,7 +26,7 @@ $ gotf --help
   ___   __  ____  ____
  / __) /  \(_  _)(  __)
 ( (_ \(  O ) )(   ) _)
- \___/ \__/ (__) (__)   v0.2.0 (commit=eb8844da0920b4ef912c6f719d1b77495452e94f, date=2020-01-24T23:14:54Z)
+ \___/ \__/ (__) (__)   v0.4.1 (commit=ee178b13db5e2620b5a931a09899a04a74d9c7d8, date=2020-01-28T16:29:01Z)
 
 gotf is a Terraform wrapper facilitating configurations for various environments
 
@@ -34,11 +34,12 @@ Usage:
   gotf [flags] [Terraform args]
 
 Flags:
-  -c, --config string      Config file to be used (default "gotf.yaml")
-  -d, --debug              Print additional debug output
-  -h, --help               help for gotf
-  -p, --params key=value   Params for templating in the config file. May be specified multiple times (default map[])
-      --version            version for gotf
+  -c, --config string       Config file to be used (default "gotf.yaml")
+  -d, --debug               Print additional debug output to stderr
+  -h, --help                help for gotf
+  -m, --module-dir string   The module directory to run Terraform in
+  -p, --params key=value    Params for templating in the config file. May be specified multiple times (default map[])
+      --version             version for gotf
 ```
 
 `gotf` is configured via config file.
