@@ -73,7 +73,7 @@ vars:
     }
   module_path: "{{ .Params.moduleDir }}"
   module: "{{ base .Params.moduleDir }}"
-  state_key_prefix: '{{ regexSplit "\\d+_" (base .Params.moduleDir) 2 | last }}'
+  state_key_prefix: '{{ (splitn "_" 2 (base .Params.moduleDir))._1 }}'
 
 # Environment variables are added to the Terraform calls environment
 envs:
