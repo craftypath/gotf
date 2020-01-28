@@ -20,7 +20,7 @@ import (
 )
 
 type MapOpts struct {
-	values    map[string]string
+	values map[string]string
 }
 
 func (o *MapOpts) Set(value string) error {
@@ -46,6 +46,6 @@ func (o *MapOpts) Type() string {
 
 func NewMapOpts() *MapOpts {
 	return &MapOpts{
-		values:    make(map[string]string),
+		values: make(map[string]string),
 	}
 }

@@ -50,7 +50,8 @@ By default, `gotf.yaml` is loaded from the current directory.
 terraformVersion: 0.12.20
 
 # tfvars files are added to the Terraform environment via
-# TF_CLI_ARGS_<command>=-var-file=<file> for commands that support them
+# TF_CLI_ARGS_<command>=-var-file=<file> for commands that support them.
+# The are resolved relative to this file
 varFiles:
   - test-{{ .Params.env }}.tfvars
 

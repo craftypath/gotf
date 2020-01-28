@@ -21,29 +21,29 @@ import (
 )
 
 func TestLoad(t *testing.T) {
-	got, err := Load("testdata/test_config.yaml", map[string]string{
+	got, err := Load("testdata/test_config.yaml", "testdata/testmodule", map[string]string{
 		"param": "paramvalue",
 		"env":   "prod",
 	})
 	assert.NoError(t, err)
 
-	assert.Equal(t, got.VarFiles, []string{
-		"testdata/testmodule/test1-prod.tfvars",
-		"testdata/testmodule/test2-prod.tfvars",
-	})
-	assert.Equal(t, got.Vars, map[string]string{
+	assert.Equal(t, []string{
+		"../testmodule/test1-prod.tfvars",
+		"../testmodule/test2-prod.tfvars",
+	}, got.VarFiles)
+	assert.Equal(t, map[string]string{
 		"foo":          "foovalue",
 		"templatedVar": "paramvalue",
 		"mapvar":       "{\n  value1 = \"testvalue\"\n  value2 = true\n}",
-	})
-	assert.Equal(t, got.Envs, map[string]string{
+	}, got.Vars)
+	assert.Equal(t, map[string]string{
 		"BAR":           "barvalue",
 		"TEMPLATED_ENV": "paramvalue",
-	})
-	assert.Equal(t, got.BackendConfigs, map[string]string{
+	}, got.Envs)
+	assert.Equal(t, map[string]string{
 		"backend_key":                  "be_key_foovalue_barvalue",
 		"backend_storage_account_name": "be_storage_account_name_foovalue_barvalue",
 		"backend_resource_group_name":  "be_resource_group_name_foovalue_barvalue",
 		"backend_container_name":       "be_container_name_foovalue_barvalue",
-	})
+	}, got.BackendConfigs)
 }

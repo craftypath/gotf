@@ -35,7 +35,7 @@ type Config struct {
 	BackendConfigs   map[string]string `yaml:"backendConfigs"`
 }
 
-func Load(configFile string, params map[string]string) (*Config, error) {
+func Load(configFile string, moduleDir string, params map[string]string) (*Config, error) {
 	log.Println("Loading config file:", configFile)
 	cfgData, err := ioutil.ReadFile(configFile)
 	if err != nil {
@@ -53,6 +53,10 @@ func Load(configFile string, params map[string]string) (*Config, error) {
 
 	log.Println("Processing varFiles...")
 	cfgFileDir := filepath.Dir(configFile)
+	cfgFileDirRelativeToModulDir, err := filepath.Rel(moduleDir, cfgFileDir)
+	if err != nil {
+		return nil, err
+	}
 	for i, f := range cfg.VarFiles {
 		sb := strings.Builder{}
 		err := renderTemplate(&sb, templatingInput, f)
@@ -61,7 +65,7 @@ func Load(configFile string, params map[string]string) (*Config, error) {
 		}
 		varFile := sb.String()
 		if !filepath.IsAbs(f) {
-			varFile = filepath.Join(cfgFileDir, varFile)
+			varFile = filepath.Join(cfgFileDirRelativeToModulDir, varFile)
 		}
 		cfg.VarFiles[i] = varFile
 	}

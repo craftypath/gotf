@@ -72,11 +72,11 @@ oEIgXTMyCILo34Fa/C6VCm2WBgz9zZO8/rHIiQm1J5zqz0DrDwKBUM9C
 )
 
 type Args struct {
-	Debug bool
+	Debug      bool
 	ConfigFile string
-	ModuleDir string
-	Params map[string]string
-	Args []string
+	ModuleDir  string
+	Params     map[string]string
+	Args       []string
 }
 
 func Run(args Args) error {
@@ -97,7 +97,7 @@ func Run(args Args) error {
 	}
 	params["moduleDir"] = args.ModuleDir
 
-	cfg, err := config.Load(args.ConfigFile, params)
+	cfg, err := config.Load(args.ConfigFile, args.ModuleDir, params)
 	if err != nil {
 		return err
 	}

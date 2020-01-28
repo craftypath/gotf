@@ -1,1 +1,1 @@
-baz = "bazvalue"
+bar = "bazvalue"

@@ -6,16 +6,10 @@ variable "foo" {}
 
 variable "bar" {}
 
-variable "baz" {}
-
 variable "mapvar" {}
 
 output "foo" {
   value = var.foo
-}
-
-output "baz" {
-  value = var.baz
 }
 
 output "mapvar" {
@@ -27,6 +21,6 @@ resource "null_resource" "echo" {
     command = "echo foo=${var.foo}"
   }
   provisioner "local-exec" {
-    command = "echo baz=${var.baz}"
+    command = "echo baz=${var.bar}"
   }
 }

@@ -28,8 +28,8 @@ import (
 )
 
 func Test_e2e(t *testing.T) {
-	os.RemoveAll("testdata/.tfstate")
-	os.RemoveAll(".terraform")
+	os.RemoveAll("testdata/01_testmodule/.tfstate")
+	os.RemoveAll("testdata/01_testmodule/.terraform")
 
 	tempDir, err := ioutil.TempDir("", "gotf")
 	panicOnError(err)
@@ -41,19 +41,18 @@ func Test_e2e(t *testing.T) {
 	}
 	env := []string{"XDG_CACHE_HOME=" + filepath.Join(tempDir, "test")}
 
-	output, err := runProcess(binary, env, "-d", "-c", "testdata/test_config.yaml", "-p", "env=prod", "init", "-no-color", "testdata/testmodule")
+	output, err := runProcess(binary, env, "-d", "-c", "testdata/test_config.yaml", "-p", "env=prod", "-m", "testdata/01_testmodule", "init", "-no-color")
 	assert.NoError(t, err)
 	assert.Contains(t, output, "Terraform has been successfully initialized!")
 
-	output, err = runProcess(binary, env, "-d", "-c", "testdata/test_config.yaml", "-p", "env=prod", "plan", "-no-color", "testdata/testmodule")
+	output, err = runProcess(binary, env, "-d", "-c", "testdata/test_config.yaml", "-p", "env=prod", "-m", "testdata/01_testmodule", "plan", "-no-color")
 	assert.NoError(t, err)
 	assert.Contains(t, output, "# null_resource.echo will be created")
 	assert.Contains(t, output, "Plan: 1 to add, 0 to change, 0 to destroy.")
 
-	output, err = runProcess(binary, env, "-d", "-c", "testdata/test_config.yaml", "-p", "env=prod", "apply", "-auto-approve", "-no-color", "testdata/testmodule")
+	output, err = runProcess(binary, env, "-d", "-c", "testdata/test_config.yaml", "-p", "env=prod", "-m", "testdata/01_testmodule", "apply", "-auto-approve", "-no-color")
 	assert.NoError(t, err)
-	assert.Contains(t, output, `baz = bazvalue
-foo = 42
+	assert.Contains(t, output, `foo = 42
 mapvar = {
   entry1 = {
     value1 = testvalue1
