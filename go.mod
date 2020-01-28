@@ -8,7 +8,6 @@ require (
 	github.com/huandu/xstrings v1.3.0 // indirect
 	github.com/imdario/mergo v0.3.8 // indirect
 	github.com/mholt/archiver/v3 v3.3.0
-	github.com/otiai10/copy v1.0.2
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/stretchr/testify v1.4.0

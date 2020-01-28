@@ -17,6 +17,7 @@ package gotf
 import (
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 
@@ -68,7 +69,9 @@ gotf is a Terraform wrapper facilitating configurations for various environments
 	command.Flags().StringVarP(&moduleDir, "module-dir", "m", "", "The module directory to run Terraform in")
 	command.Flags().SetInterspersed(false)
 	command.SetVersionTemplate("{{ .Version }}\n")
-	command.MarkFlagRequired("module-dir")
+	if err := command.MarkFlagRequired("module-dir"); err != nil {
+		log.Fatalln(err)
+	}
 
 	if err := command.Execute(); err != nil {
 		var exitCode int
