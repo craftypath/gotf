@@ -31,5 +31,5 @@ func Build() error {
 }
 
 func Release() error {
-	return sh.Run("goreleaser", "release", "--rm-dist", "--snapshot")
+	return sh.Run("goreleaser", "release", "--rm-dist")
 }
