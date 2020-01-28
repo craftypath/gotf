@@ -23,7 +23,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/otiai10/copy"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -85,10 +84,6 @@ func runProcess(binary string, env []string, args ...string) (string, error) {
 	s := strings.TrimSpace(string(output))
 	fmt.Println(s)
 	return s, err
-}
-
-func copyToDir(dst string, src string) {
-	panicOnError(copy.Copy(dst, src))
 }
 
 func panicOnError(err error) {

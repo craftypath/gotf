@@ -25,7 +25,7 @@ import (
 
 	"github.com/unguiculus/gotf/pkg/config"
 	"github.com/unguiculus/gotf/pkg/sh"
-	"github.com/unguiculus/gotf/pkg/tf"
+	terraform "github.com/unguiculus/gotf/pkg/tf"
 )
 
 var (
