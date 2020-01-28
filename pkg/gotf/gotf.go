@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package cmd
+package gotf
 
 import (
 	"io/ioutil"
@@ -70,7 +70,11 @@ oEIgXTMyCILo34Fa/C6VCm2WBgz9zZO8/rHIiQm1J5zqz0DrDwKBUM9C
 	}
 )
 
-func Run(debug bool, cfgFile string, params map[string]string, args ...string) error {
+func Run(debug bool, cfgFile string, args ...string) error {
+	return RunWithParams(debug, cfgFile, map[string]string{}, args...)
+}
+
+func RunWithParams(debug bool, cfgFile string, params map[string]string, args ...string) error {
 	if debug {
 		log.SetOutput(os.Stderr)
 		log.SetFlags(0)

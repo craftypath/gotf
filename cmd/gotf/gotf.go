@@ -22,7 +22,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/unguiculus/gotf/pkg/cmd"
+	"github.com/unguiculus/gotf/pkg/gotf"
 	"github.com/unguiculus/gotf/pkg/opts"
 )
 
@@ -31,7 +31,7 @@ func Execute() {
 	params := opts.NewMapOpts()
 	var debug bool
 
-	fullVersion := fmt.Sprintf("%s (commit=%s, date=%s)", cmd.Version, cmd.GitCommit, cmd.BuildDate)
+	fullVersion := fmt.Sprintf("%s (commit=%s, date=%s)", gotf.Version, gotf.GitCommit, gotf.BuildDate)
 	command := &cobra.Command{
 		Use:   "gotf [flags] [Terraform args]",
 		Short: "gotf is a Terraform wrapper facilitating configurations for various environments",
@@ -51,7 +51,7 @@ gotf is a Terraform wrapper facilitating configurations for various environments
 			return nil
 		},
 		RunE: func(command *cobra.Command, args []string) error {
-			return cmd.Run(debug, cfgFile, params.GetAll(), args...)
+			return gotf.RunWithParams(debug, cfgFile, params.GetAll(), args...)
 		},
 	}
 
