@@ -50,19 +50,9 @@ func NewTerraform(config *config.Config, moduleDir string, params map[string]str
 func (tf *Terraform) Execute(args ...string) error {
 	env := map[string]string{}
 	stringMapAppend(env, tf.config.Envs)
-
-	sb := strings.Builder{}
-	tf.appendVarFileArgs(&sb)
+	tf.appendVarFileArgs(env)
 	tf.appendVarArgs(env)
-
-	varFilesArgs := sb.String()
-	for _, cmd := range commandsWithVars {
-		env["TF_CLI_ARGS_"+cmd] = varFilesArgs
-	}
-
-	sb = strings.Builder{}
-	tf.appendBackendConfigs(&sb, env)
-	env["TF_CLI_ARGS_init"] = sb.String()
+	tf.appendBackendConfigs(env)
 
 	return tf.shell.Execute(env, tf.moduleDir, tf.binaryPath, args...)
 }
@@ -73,22 +63,35 @@ func (tf *Terraform) appendVarArgs(env map[string]string) {
 	}
 }
 
-func (tf *Terraform) appendVarFileArgs(sb *strings.Builder) {
-	for _, f := range tf.config.VarFiles {
-		if sb.Len() > 0 {
-			sb.WriteString(" ")
+func (tf *Terraform) appendVarFileArgs(env map[string]string) {
+	varFiles := tf.config.VarFiles
+	if len(varFiles) > 0 {
+		sb := strings.Builder{}
+		for _, f := range varFiles {
+			if sb.Len() > 0 {
+				sb.WriteString(" ")
+			}
+			sb.WriteString(fmt.Sprintf("-var-file=%q", f))
 		}
-		sb.WriteString(fmt.Sprintf("-var-file=%q", f))
+		varFilesArgs := sb.String()
+		for _, cmd := range commandsWithVars {
+			env["TF_CLI_ARGS_"+cmd] = varFilesArgs
+		}
 	}
 }
 
-func (tf *Terraform) appendBackendConfigs(sb *strings.Builder, env map[string]string) {
-	for k, v := range tf.config.BackendConfigs {
-		env["TF_VAR_backend_"+k] = v
-		if sb.Len() > 0 {
-			sb.WriteString(" ")
+func (tf *Terraform) appendBackendConfigs(env map[string]string) {
+	configs := tf.config.BackendConfigs
+	if len(configs) > 0 {
+		sb := strings.Builder{}
+		for k, v := range configs {
+			env["TF_VAR_backend_"+k] = v
+			if sb.Len() > 0 {
+				sb.WriteString(" ")
+			}
+			sb.WriteString(fmt.Sprintf("-backend-config=%s=%q", k, v))
 		}
-		sb.WriteString(fmt.Sprintf("-backend-config=%s=%q", k, v))
+		env["TF_CLI_ARGS_init"] = sb.String()
 	}
 }
 
