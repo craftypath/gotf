@@ -1,3 +1,6 @@
+before:
+  hooks:
+    - go mod download
 builds:
   - main: main.go
     binary: gotf
@@ -14,6 +17,10 @@ builds:
         -X github.com/unguiculus/gotf/pkg/gotf.Version={{ .Tag }}
         -X github.com/unguiculus/gotf/pkg/gotf.GitCommit={{ .Commit }}
         -X github.com/unguiculus/gotf/pkg/gotf.BuildDate={{ .Date }}
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Tag }}-next"
 archives:
   - format_overrides:
       - goos: windows
@@ -21,7 +28,15 @@ archives:
     files:
       - LICENSE
       - README.md
-checksum:
-  name_template: 'checksums.txt'
-snapshot:
-  name_template: "{{ .Tag }}-next"
+brews:
+  - github:
+      owner: unguiculus
+      name: homebrew-gotf
+    commit_author:
+      name: unguiculus
+      email: unguiculus@users.noreply.github.com
+    folder: Formula
+    homepage:  https://github.com/unguiculus/gotf/
+    description: Handling multiple environments with Terraform made easy
+    test: |
+      system "#{bin}/gotf --version"

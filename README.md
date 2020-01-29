@@ -12,6 +12,12 @@ Download a release from GitHub:
 
 https://github.com/unguiculus/gotf/releases
 
+### Homebrew
+
+```console
+$ brew install unguiculus/gotf/gotf
+```
+
 ### Using `go get`
 
 ```console
