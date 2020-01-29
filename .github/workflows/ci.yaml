@@ -3,11 +3,13 @@ name: CI
 on:
   pull_request:
   push:
+    branches:
+      - master
     tags:
       - v*
 
 jobs:
-  lint-test:
+  ci:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

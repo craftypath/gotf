@@ -1,6 +1,6 @@
 # gotf
 
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![Test](https://github.com/unguiculus/gotf/workflows/Test/badge.svg)](https://github.com/unguiculus/gotf/actions)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) ![CI](https://github.com/unguiculus/gotf/workflows/CI/badge.svg?branch=master&event=push)
 
 `gotf` is a Terraform wrapper that makes it easy to support multiple configurations, e. g. for different environments.
 
