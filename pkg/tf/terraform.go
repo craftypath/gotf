@@ -15,7 +15,11 @@
 package terraform
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/unguiculus/gotf/pkg/config"
@@ -54,6 +58,9 @@ func (tf *Terraform) Execute(args ...string) error {
 	tf.appendVarArgs(env)
 	tf.appendBackendConfigs(env)
 
+	if err := tf.checkBackendConfig(args...); err != nil {
+		return err
+	}
 	return tf.shell.Execute(env, tf.moduleDir, tf.binaryPath, args...)
 }
 
@@ -93,6 +100,46 @@ func (tf *Terraform) appendBackendConfigs(env map[string]string) {
 		}
 		env["TF_CLI_ARGS_init"] = sb.String()
 	}
+}
+
+func (tf *Terraform) checkBackendConfig(args ...string) error {
+	if len(args) >= 2 {
+		if args[0] == "init" {
+			for _, arg := range args[1:] {
+				if arg == "-reconfigure" {
+					return nil
+				}
+			}
+		}
+	}
+
+	backendFile := filepath.Join(tf.moduleDir, ".terraform", "terraform.tfstate")
+	bytes, err := ioutil.ReadFile(backendFile)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return err
+	}
+
+	var backendJson map[string]interface{}
+	if err := json.Unmarshal(bytes, &backendJson); err != nil {
+		return err
+	}
+
+	for k, v := range tf.config.BackendConfigs {
+		b := backendJson["backend"].(map[string]interface{})
+		c := b["config"].(map[string]interface{})
+		currentVal := c[k]
+		if v != currentVal {
+			return fmt.Errorf(`Configured backend does not match current environment
+Got: %s
+Want: %s
+
+Run terraform init -reconfigure!`, currentVal, v)
+		}
+	}
+	return nil
 }
 
 func stringMapAppend(target map[string]string, src map[string]string) {
