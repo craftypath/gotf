@@ -1,6 +1,6 @@
 # gotf
 
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) ![CI](https://github.com/unguiculus/gotf/workflows/CI/badge.svg?branch=master&event=push)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) ![CI](https://github.com/craftypath/gotf/workflows/CI/badge.svg?branch=master&event=push)
 
 `gotf` is a Terraform wrapper that makes it easy to support multiple configurations, e. g. for different environments.
 
@@ -10,18 +10,13 @@
 
 Download a release from GitHub:
 
-https://github.com/unguiculus/gotf/releases
+https://github.com/craftypath/gotf/releases
 
 ### Homebrew
 
 ```console
-$ brew install unguiculus/gotf/gotf
-```
-
-### Using `go get`
-
-```console
-$ go get github.com/unguiculus/gotf
+$ brew tap craftypath/tap
+$ brew install gotf
 ```
 
 ## Usage
@@ -32,7 +27,7 @@ $ gotf --help
   ___   __  ____  ____
  / __) /  \(_  _)(  __)
 ( (_ \(  O ) )(   ) _)
- \___/ \__/ (__) (__)   v0.4.1 (commit=ee178b13db5e2620b5a931a09899a04a74d9c7d8, date=2020-01-28T16:29:01Z)
+ \___/ \__/ (__) (__)   v0.6.0 (commit=c2206ae3c8fb02ddf32ce49c267e8d92624c37f1, date=2020-01-29T22:13:46Z)
 
 gotf is a Terraform wrapper facilitating configurations for various environments
 

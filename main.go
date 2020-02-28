@@ -1,6 +1,6 @@
 package main
 
-import "github.com/unguiculus/gotf/cmd/gotf"
+import "github.com/craftypath/gotf/cmd/gotf"
 
 func main() {
 	gotf.Execute()
