@@ -23,9 +23,9 @@ import (
 
 	"github.com/adrg/xdg"
 
-	"github.com/unguiculus/gotf/pkg/config"
-	"github.com/unguiculus/gotf/pkg/sh"
-	terraform "github.com/unguiculus/gotf/pkg/tf"
+	"github.com/craftypath/gotf/pkg/config"
+	"github.com/craftypath/gotf/pkg/sh"
+	terraform "github.com/craftypath/gotf/pkg/tf"
 )
 
 var (

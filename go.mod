@@ -1,4 +1,4 @@
-module github.com/unguiculus/gotf
+module github.com/craftypath/gotf
 
 go 1.13
 

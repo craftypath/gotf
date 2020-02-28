@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/unguiculus/gotf/pkg/config"
+	"github.com/craftypath/gotf/pkg/config"
 )
 
 type (

@@ -14,9 +14,9 @@ builds:
       - windows
     ldflags:
       - >-
-        -X github.com/unguiculus/gotf/pkg/gotf.Version={{ .Tag }}
-        -X github.com/unguiculus/gotf/pkg/gotf.GitCommit={{ .Commit }}
-        -X github.com/unguiculus/gotf/pkg/gotf.BuildDate={{ .Date }}
+        -X github.com/craftypath/gotf/pkg/gotf.Version={{ .Tag }}
+        -X github.com/craftypath/gotf/pkg/gotf.GitCommit={{ .Commit }}
+        -X github.com/craftypath/gotf/pkg/gotf.BuildDate={{ .Date }}
 checksum:
   name_template: 'checksums.txt'
 snapshot:
@@ -30,13 +30,13 @@ archives:
       - README.md
 brews:
   - github:
-      owner: unguiculus
-      name: homebrew-gotf
+      owner: craftypath
+      name: homebrew-tap
     commit_author:
-      name: unguiculus
-      email: unguiculus@users.noreply.github.com
+      name: craftypath
+      email: craftypath@users.noreply.github.com
     folder: Formula
-    homepage:  https://github.com/unguiculus/gotf/
+    homepage:  https://github.com/craftypath/gotf/
     description: Handling multiple environments with Terraform made easy
     test: |
       system "#{bin}/gotf --version"

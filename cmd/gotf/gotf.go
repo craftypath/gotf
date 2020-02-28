@@ -23,8 +23,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/unguiculus/gotf/pkg/gotf"
-	"github.com/unguiculus/gotf/pkg/opts"
+	"github.com/craftypath/gotf/pkg/gotf"
+	"github.com/craftypath/gotf/pkg/opts"
 )
 
 func Execute() {
