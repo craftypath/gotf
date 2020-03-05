@@ -1,0 +1,22 @@
+terraformVersion: "0.12.20"
+varFiles:
+  - 01_testmodule/test-{{ .Params.env }}.tfvars
+vars:
+  foo: 42
+  mapvar: |-
+    {
+      entry1 = {
+        value1 = testvalue1
+        value2 = true
+      }
+      entry2 = {
+        value1 = testvalue2
+        value2 = false
+      }
+    }
+  module_dir: "{{ base .Params.moduleDir }}"
+  state_key: '{{ (splitn "_" 2 (base .Params.moduleDir))._1 }}'
+envs:
+  BAR: barvalue
+backendConfigs:
+  path: .terraform/terraform-{{ .Vars.state_key }}-prod.tfstate

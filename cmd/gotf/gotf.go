@@ -28,6 +28,19 @@ import (
 )
 
 func Execute() {
+	command := newGotfCommand()
+	if err := command.Execute(); err != nil {
+		var exitCode int
+		if err, ok := err.(*exec.ExitError); ok {
+			exitCode = err.ExitCode()
+		} else {
+			exitCode = 1
+		}
+		os.Exit(exitCode)
+	}
+}
+
+func newGotfCommand() *cobra.Command {
 	var cfgFile string
 	params := opts.NewMapOpts()
 	var debug bool
@@ -69,17 +82,9 @@ gotf is a Terraform wrapper facilitating configurations for various environments
 	command.Flags().StringVarP(&moduleDir, "module-dir", "m", "", "The module directory to run Terraform in")
 	command.Flags().SetInterspersed(false)
 	command.SetVersionTemplate("{{ .Version }}\n")
+	command.SilenceUsage = true
 	if err := command.MarkFlagRequired("module-dir"); err != nil {
 		log.Fatalln(err)
 	}
-
-	if err := command.Execute(); err != nil {
-		var exitCode int
-		if err, ok := err.(*exec.ExitError); ok {
-			exitCode = err.ExitCode()
-		} else {
-			exitCode = 1
-		}
-		os.Exit(exitCode)
-	}
+	return command
 }

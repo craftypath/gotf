@@ -19,4 +19,4 @@ vars:
 envs:
   BAR: barvalue
 backendConfigs:
-  path: .tfstate/terraform.tfstate
+  path: .terraform/terraform-{{ .Vars.state_key }}-dev.tfstate
