@@ -33,8 +33,8 @@ brews:
       owner: craftypath
       name: homebrew-tap
     commit_author:
-      name: craftypath
-      email: craftypath@users.noreply.github.com
+      name: craftypath-ci-bot
+      email: craftypath-ci-bot@users.noreply.github.com
     folder: Formula
     homepage:  https://github.com/craftypath/gotf/
     description: Handling multiple environments with Terraform made easy
