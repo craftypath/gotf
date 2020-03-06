@@ -1,4 +1,4 @@
-terraformVersion: "0.12.20"
+terraformVersion: "0.12.21"
 varFiles:
   - testmodule/test1-{{ .Params.env }}.tfvars
   - testmodule/test2-{{ .Params.env }}.tfvars
