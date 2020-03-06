@@ -43,38 +43,38 @@ Flags:
       --version             version for gotf
 ```
 
-### Configuration
+## Configuration
 
 `gotf` is configured via config file.
 By default, `gotf.yaml` is loaded from the current directory.
 In a real-world scenario, you will probably have a config file per environment.
 Config files support templating as specified below.
 
-#### Parameters
+### Parameters
 
-##### terraformVersion
+#### `terraformVersion`
 
 Optionally sets a specific Terraform version to use.
 `gotf` will download this version and cache it in `$XDG_CACHE_HOME/gotf/terraform/<version>` verifying GPG signature and SHA256 sum.
 
-##### varFiles
+#### `varFiles`
 
 Variable files for Terraform which are added to the Terraform environment via `TF_CLI_ARGS_<command>=-var-file=<file>` for commands that support them.
 They are resolved relative to this config file.
 
-##### vars
+#### `vars`
 
 A list of variables that are added to the Terraform environment via `TF_VAR_<var>=value` for commands that support them.
 
-##### envs
+#### `envs`
 
 Environment variables to be added to the Terraform process.
 
-##### backendConfigs
+#### `backendConfigs`
 
 Backend configs are always added as variables (`TF_VAR_backend_<var>=value`) for commands that support them and, in case of `init`, additionally as `-backend-config` CLI options.
 
-#### Example
+### Example
 
 ```yaml
 terraformVersion: 0.12.21
@@ -111,7 +111,7 @@ backendConfigs:
   container_name: be_container_name_{{ .Vars.foo }}_{{ .Envs.BAR }}
 ```
 
-#### Templating
+### Templating
 
 Go templating can be used in the config file as follows.
 The [Sprig](https://masterminds.github.io/sprig/) function library is included.
@@ -166,7 +166,7 @@ backendConfigs:
   container_name: be_container_name_foovalue_barvalue
 ```
 
-#### Debug Output
+## Debug Output
 
 Specifying the `--debug` flag produces debug output which is written to stderr.
 For example, the integration test in [cmd/gotf/gotf_test.go](cmd/gotf/gotf_test.go) produces the following debug output before running Terraform:
