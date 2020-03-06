@@ -53,7 +53,7 @@ func Load(configFile string, moduleDir string, params map[string]string) (*Confi
 
 	log.Println("Processing varFiles...")
 	cfgFileDir := filepath.Dir(configFile)
-	cfgFileDirRelativeToModulDir, err := filepath.Rel(moduleDir, cfgFileDir)
+	cfgFileDirRelativeToModuleDir, err := filepath.Rel(moduleDir, cfgFileDir)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func Load(configFile string, moduleDir string, params map[string]string) (*Confi
 		}
 		varFile := sb.String()
 		if !filepath.IsAbs(f) {
-			varFile = filepath.Join(cfgFileDirRelativeToModulDir, varFile)
+			varFile = filepath.Join(cfgFileDirRelativeToModuleDir, varFile)
 		}
 		cfg.VarFiles[i] = varFile
 	}
