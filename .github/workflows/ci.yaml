@@ -32,6 +32,9 @@ jobs:
           ./setup.sh
           echo "::add-path::$(go env GOPATH)/bin"
 
+      - name: Check License Headers
+        run: mage checkLicenseHeaders
+
       - name: Lint
         run: mage lint
 
