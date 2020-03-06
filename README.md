@@ -43,24 +43,45 @@ Flags:
       --version             version for gotf
 ```
 
+### Configuration
+
 `gotf` is configured via config file.
 By default, `gotf.yaml` is loaded from the current directory.
+In a real-world scenario, you will probably have a config file per environment.
+Config files support templating as specified below.
 
-### Example
+#### Parameters
+
+##### terraformVersion
+
+Optionally sets a specific Terraform version to use.
+`gotf` will download this version and cache it in `$XDG_CACHE_HOME/gotf/terraform/<version>` verifying GPG signature and SHA256 sum.
+
+##### varFiles
+
+Variable files for Terraform which are added to the Terraform environment via `TF_CLI_ARGS_<command>=-var-file=<file>` for commands that support them.
+They are resolved relative to this config file.
+
+##### vars
+
+A list of variables that are added to the Terraform environment via `TF_VAR_<var>=value` for commands that support them.
+
+##### envs
+
+Environment variables to be added to the Terraform process.
+
+##### backendConfigs
+
+Backend configs are always added as variables (`TF_VAR_backend_<var>=value`) for commands that support them and, in case of `init`, additionally as `-backend-config` CLI options.
+
+#### Example
 
 ```yaml
-# Optionally set a specific Terraform version. gotf will download this version and cache
-# it in $XDG_CACHE_HOME/gotf/terraform/<version> verifying GPG signature and SHA256 sum
-terraformVersion: 0.12.20
+terraformVersion: 0.12.21
 
-# tfvars files are added to the Terraform environment via
-# TF_CLI_ARGS_<command>=-var-file=<file> for commands that support them.
-# The are resolved relative to this file
 varFiles:
   - test-{{ .Params.env }}.tfvars
 
-# Variables are added to the Terraform environment via
-# TF_VAR_<var>=value for commands that support them
 vars:
   foo: foovalue
   templated_var: "{{ .Params.param }}"
@@ -79,22 +100,18 @@ vars:
   module: "{{ base .Params.moduleDir }}"
   state_key_prefix: '{{ (splitn "_" 2 (base .Params.moduleDir))._1 }}'
 
-# Environment variables are added to the Terraform calls environment
 envs:
   BAR: barvalue
   TEMPLATED_ENV: "{{ .Params.param }}"
 
-# Backend configs are always added as variables (TF_VAR_backend_<var>=value) for commands
-# that support them and, if in case of 'init' additionally as '-backend-config' CLI options.
-# Note the prefix 'backend_'  in the variable names.
 backendConfigs:
-  key: "{{ .Vars.state_key_prefix }}_{{ .Vars.templated_var }}_{{ .Params.key_suffix }}
+  key: "{{ .Vars.state_key_prefix }}_{{ .Vars.templated_var }}_{{ .Params.key_suffix }}"
   storage_account_name: be_storage_account_name_{{ .Vars.foo }}_{{ .Envs.BAR }}
   resource_group_name: be_resource_group_name_{{ .Vars.foo }}_{{ .Envs.BAR }}
   container_name: be_container_name_{{ .Vars.foo }}_{{ .Envs.BAR }}
 ```
 
-## Templating
+#### Templating
 
 Go templating can be used in the config file as follows.
 The [Sprig](https://masterminds.github.io/sprig/) function library is included.
@@ -115,7 +132,7 @@ $ gotf -c example-config.yaml -p param=myval -p key_suffix=mysuffix -m my_module
 After processing, the config file would look like this:
 
 ```yaml
-terraformVersion: 0.12.20
+terraformVersion: 0.12.21
 
 varFiles:
   - test-prod.tfvars
@@ -147,4 +164,53 @@ backendConfigs:
   storage_account_name: be_storage_account_name_foovalue_barvalue
   resource_group_name: be_resource_group_name_foovalue_barvalue
   container_name: be_container_name_foovalue_barvalue
+```
+
+#### Debug Output
+
+Specifying the `--debug` flag produces debug output which is written to stderr.
+For example, the integration test in [cmd/gotf/gotf_test.go](cmd/gotf/gotf_test.go) produces the following debug output before running Terraform:
+
+```console
+gotf> Loading config file: testdata/test-config-prod.yaml
+gotf> Processing varFiles...
+gotf> Processing vars...
+gotf> Processing envs...
+gotf> Proessing backendConfigs...
+gotf> Using Terraform version 0.12.21
+gotf> Downloading Terraform distro...
+gotf> Downloading SHA256 sums file...
+gotf> Downloading SHA256 sums signature file...
+gotf> Verifying GPG signature...
+gotf> Verifying SHA256 sum...
+gotf> Unzipping distro...
+gotf> Terraform binary: /Users/myuser/Library/Caches/gotf/terraform/0.12.21/terraform
+gotf>
+gotf> Terraform command-line:
+gotf> -----------------------
+gotf> /Users/myuser/Library/Caches/gotf/terraform/0.12.21/terraform init -no-color
+gotf>
+gotf> Terraform environment:
+gotf> ----------------------
+gotf> TF_VAR_mapvar={
+  entry1 = {
+    value1 = testvalue1
+    value2 = true
+  }
+  entry2 = {
+    value1 = testvalue2
+    value2 = false
+  }
+}
+gotf> TF_VAR_backend_path=.terraform/terraform-testmodule-prod.tfstate
+gotf> TF_CLI_ARGS_init=-backend-config=path=".terraform/terraform-testmodule-prod.tfstate"
+gotf> TF_VAR_state_key=testmodule
+gotf> TF_VAR_foo=42
+gotf> BAR=barvalue
+gotf> TF_CLI_ARGS_apply=-var-file="../01_testmodule/test-prod.tfvars"
+gotf> TF_CLI_ARGS_destroy=-var-file="../01_testmodule/test-prod.tfvars"
+gotf> TF_CLI_ARGS_plan=-var-file="../01_testmodule/test-prod.tfvars"
+gotf> TF_CLI_ARGS_refresh=-var-file="../01_testmodule/test-prod.tfvars"
+gotf> TF_CLI_ARGS_import=-var-file="../01_testmodule/test-prod.tfvars"
+gotf> TF_VAR_module_dir=01_testmodule
 ```
