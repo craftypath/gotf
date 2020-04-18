@@ -1,0 +1,48 @@
+terraformVersion: "0.12.24"
+
+requiredParams:
+  environment:
+    - dev
+    - prod
+
+params:
+  param: paramvalue
+
+moduleVars:
+  testmodule1:
+    moduleVar1: testmodule1_value1
+    moduleVar2: testmodule1_value2
+  testmodule2:
+    moduleVar1: testmodule2_value1
+    moduleVar2: testmodule2_value2
+
+moduleVarFiles:
+  testmodule1:
+    - testmodule1/test1-{{ .Params.environment }}.tfvars
+    - testmodule1/test2-{{ .Params.environment }}.tfvars
+  testmodule2:
+    - testmodule2/test1-{{ .Params.environment }}.tfvars
+    - testmodule2/test2-{{ .Params.environment }}.tfvars
+
+globalVarFiles:
+  - global.tfvars
+  - global-{{ .Params.environment }}.tfvars
+
+globalVars:
+  foo: foovalue
+  templatedVar: "{{ .Params.param }}"
+  mapvar: |-
+    {
+      value1 = "testvalue"
+      value2 = true
+    }
+
+envs:
+  BAR: barvalue
+  TEMPLATED_ENV: "{{ .Params.param }}"
+
+backendConfigs:
+  key: "{{ .Params.moduleDir }}"
+  storage_account_name: mytfstateaccount{{ .Params.environment }}
+  resource_group_name: mytfstate-{{ .Params.environment }}
+  container_name: mytfstate-{{ .Params.environment }}

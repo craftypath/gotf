@@ -1,0 +1,49 @@
+terraformVersion: 0.12.24
+
+requiredParams:
+  environment:
+    - dev
+    - prod
+
+params:
+  param: myval
+
+globalVarFiles:
+  - global-{{ .Params.environment }}.tfvars
+  - global.tfvars
+
+globalVars:
+  foo: 42
+  templated_var: "{{ .Params.param }}"
+  mapvar: |-
+    {
+      entry1 = {
+        value1 = testvalue1
+        value2 = true
+      }
+      entry2 = {
+        value1 = testvalue2
+        value2 = false
+      }
+    }
+  module_dir: "{{ .Params.moduleDir }}"
+  state_key: '{{ (splitn "_" 2 .Params.moduleDir)._1 }}'
+
+moduleVarFiles:
+  01_networking:
+    - 01_networking/{{ .Params.environment }}.tfvars
+  02_compute:
+    - 02_compute/{{ .Params.environment }}.tfvars
+
+moduleVars:
+  01_networking:
+    myvar: value for networking
+  02_compute:
+    myvar: value for compute
+
+envs:
+  BAR: barvalue
+  TEMPLATED_ENV: "{{ .Params.param }}"
+
+backendConfigs:
+  path: .terraform/terraform-{{ .Vars.state_key }}-{{ .Params.environment }}.tfstate

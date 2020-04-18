@@ -4,3 +4,4 @@
 .project
 .settings
 dist
+testdata/gotf*

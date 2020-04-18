@@ -18,32 +18,239 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestLoad(t *testing.T) {
-	got, err := Load("testdata/test_config.yaml", "testdata/testmodule", map[string]string{
-		"param": "paramvalue",
-		"env":   "prod",
-	})
-	assert.NoError(t, err)
-
-	assert.Equal(t, []string{
-		"../testmodule/test1-prod.tfvars",
-		"../testmodule/test2-prod.tfvars",
-	}, got.VarFiles)
-	assert.Equal(t, map[string]string{
-		"foo":          "foovalue",
-		"templatedVar": "paramvalue",
-		"mapvar":       "{\n  value1 = \"testvalue\"\n  value2 = true\n}",
-	}, got.Vars)
-	assert.Equal(t, map[string]string{
-		"BAR":           "barvalue",
-		"TEMPLATED_ENV": "paramvalue",
-	}, got.Envs)
-	assert.Equal(t, map[string]string{
-		"backend_key":                  "be_key_foovalue_barvalue",
-		"backend_storage_account_name": "be_storage_account_name_foovalue_barvalue",
-		"backend_resource_group_name":  "be_resource_group_name_foovalue_barvalue",
-		"backend_container_name":       "be_container_name_foovalue_barvalue",
-	}, got.BackendConfigs)
+	type args struct {
+		configFile string
+		moduleDir  string
+		params     map[string]string
+	}
+	tests := []struct {
+		name       string
+		args       args
+		want       *Config
+		wantErr    bool
+		wantErrMsg string
+	}{
+		{
+			name: "Load dev config testmodule1",
+			args: struct {
+				configFile string
+				moduleDir  string
+				params     map[string]string
+			}{
+				configFile: "testdata/test-config.yaml",
+				moduleDir:  "testmodule1",
+				params: map[string]string{
+					"environment": "dev",
+				},
+			},
+			want: &Config{
+				TerraformVersion: "0.12.24",
+				VarFiles: []string{
+					"../testdata/global.tfvars",
+					"../testdata/global-dev.tfvars",
+					"../testdata/testmodule1/test1-dev.tfvars",
+					"../testdata/testmodule1/test2-dev.tfvars",
+				},
+				Vars: map[string]string{
+					"foo":          "foovalue",
+					"templatedVar": "paramvalue",
+					"mapvar":       "{\n  value1 = \"testvalue\"\n  value2 = true\n}",
+					"moduleVar1":   "testmodule1_value1",
+					"moduleVar2":   "testmodule1_value2",
+				},
+				Envs: map[string]string{
+					"BAR":           "barvalue",
+					"TEMPLATED_ENV": "paramvalue",
+				},
+				BackendConfigs: map[string]string{
+					"key":                  "testmodule1",
+					"storage_account_name": "mytfstateaccountdev",
+					"resource_group_name":  "mytfstate-dev",
+					"container_name":       "mytfstate-dev",
+				},
+			},
+		},
+		{
+			name: "Load dev config testmodule2",
+			args: struct {
+				configFile string
+				moduleDir  string
+				params     map[string]string
+			}{
+				configFile: "testdata/test-config.yaml",
+				moduleDir:  "testmodule2",
+				params: map[string]string{
+					"environment": "dev",
+				},
+			},
+			want: &Config{
+				TerraformVersion: "0.12.24",
+				VarFiles: []string{
+					"../testdata/global.tfvars",
+					"../testdata/global-dev.tfvars",
+					"../testdata/testmodule2/test1-dev.tfvars",
+					"../testdata/testmodule2/test2-dev.tfvars",
+				},
+				Vars: map[string]string{
+					"foo":          "foovalue",
+					"templatedVar": "paramvalue",
+					"mapvar":       "{\n  value1 = \"testvalue\"\n  value2 = true\n}",
+					"moduleVar1":   "testmodule2_value1",
+					"moduleVar2":   "testmodule2_value2",
+				},
+				Envs: map[string]string{
+					"BAR":           "barvalue",
+					"TEMPLATED_ENV": "paramvalue",
+				},
+				BackendConfigs: map[string]string{
+					"key":                  "testmodule2",
+					"storage_account_name": "mytfstateaccountdev",
+					"resource_group_name":  "mytfstate-dev",
+					"container_name":       "mytfstate-dev",
+				},
+			},
+		},
+		{
+			name: "Load prod config testmodule1",
+			args: struct {
+				configFile string
+				moduleDir  string
+				params     map[string]string
+			}{
+				configFile: "testdata/test-config.yaml",
+				moduleDir:  "testmodule1",
+				params: map[string]string{
+					"environment": "prod",
+				},
+			},
+			want: &Config{
+				TerraformVersion: "0.12.24",
+				VarFiles: []string{
+					"../testdata/global.tfvars",
+					"../testdata/global-prod.tfvars",
+					"../testdata/testmodule1/test1-prod.tfvars",
+					"../testdata/testmodule1/test2-prod.tfvars",
+				},
+				Vars: map[string]string{
+					"foo":          "foovalue",
+					"templatedVar": "paramvalue",
+					"mapvar":       "{\n  value1 = \"testvalue\"\n  value2 = true\n}",
+					"moduleVar1":   "testmodule1_value1",
+					"moduleVar2":   "testmodule1_value2",
+				},
+				Envs: map[string]string{
+					"BAR":           "barvalue",
+					"TEMPLATED_ENV": "paramvalue",
+				},
+				BackendConfigs: map[string]string{
+					"key":                  "testmodule1",
+					"storage_account_name": "mytfstateaccountprod",
+					"resource_group_name":  "mytfstate-prod",
+					"container_name":       "mytfstate-prod",
+				},
+			},
+		},
+		{
+			name: "Load prod config testmodule2",
+			args: struct {
+				configFile string
+				moduleDir  string
+				params     map[string]string
+			}{
+				configFile: "testdata/test-config.yaml",
+				moduleDir:  "testmodule2",
+				params: map[string]string{
+					"environment": "prod",
+				},
+			},
+			want: &Config{
+				TerraformVersion: "0.12.24",
+				VarFiles: []string{
+					"../testdata/global.tfvars",
+					"../testdata/global-prod.tfvars",
+					"../testdata/testmodule2/test1-prod.tfvars",
+					"../testdata/testmodule2/test2-prod.tfvars",
+				},
+				Vars: map[string]string{
+					"foo":          "foovalue",
+					"templatedVar": "paramvalue",
+					"mapvar":       "{\n  value1 = \"testvalue\"\n  value2 = true\n}",
+					"moduleVar1":   "testmodule2_value1",
+					"moduleVar2":   "testmodule2_value2",
+				},
+				Envs: map[string]string{
+					"BAR":           "barvalue",
+					"TEMPLATED_ENV": "paramvalue",
+				},
+				BackendConfigs: map[string]string{
+					"key":                  "testmodule2",
+					"storage_account_name": "mytfstateaccountprod",
+					"resource_group_name":  "mytfstate-prod",
+					"container_name":       "mytfstate-prod",
+				},
+			},
+		},
+		{
+			name: "Missing required param",
+			args: struct {
+				configFile string
+				moduleDir  string
+				params     map[string]string
+			}{
+				configFile: "testdata/test-config.yaml",
+				moduleDir:  "testmodule1",
+			},
+			wantErr:    true,
+			wantErrMsg: `required parameter "environment" must be specified`,
+		},
+		{
+			name: "Invalid required param value",
+			args: struct {
+				configFile string
+				moduleDir  string
+				params     map[string]string
+			}{
+				configFile: "testdata/test-config.yaml",
+				moduleDir:  "testmodule1",
+				params: map[string]string{
+					"environment": "invalid",
+				},
+			},
+			wantErr:    true,
+			wantErrMsg: `value for required parameter "environment" must be one of [dev prod]`,
+		},
+		{
+			name: "Module dir explicitly set",
+			args: struct {
+				configFile string
+				moduleDir  string
+				params     map[string]string
+			}{
+				configFile: "testdata/test-config.yaml",
+				moduleDir:  "testmodule1",
+				params: map[string]string{
+					"environment": "dev",
+					"moduleDir":   "dummy",
+				},
+			},
+			wantErr:    true,
+			wantErrMsg: `param "moduleDir" is reserved and set automatically`,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Load(tt.args.configFile, tt.args.moduleDir, tt.args.params)
+			if tt.wantErr {
+				require.Error(t, err)
+				assert.Equal(t, tt.wantErrMsg, err.Error())
+			} else {
+				require.NoError(t, err)
+				assert.Equal(t, tt.want, got)
+			}
+		})
+	}
 }
