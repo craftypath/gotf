@@ -88,29 +88,20 @@ func Run(args Args) error {
 		log.SetOutput(ioutil.Discard)
 	}
 
-	params := make(map[string]string)
-	for k, v := range args.Params {
-		if k == "moduleDir" {
-			return fmt.Errorf("param 'module-dir' is reserved for internal use and set automatically")
-		}
-		params[k] = v
-	}
-	params["moduleDir"] = args.ModuleDir
-
-	cfg, err := config.Load(args.ConfigFile, args.ModuleDir, params)
+	cfg, err := config.Load(args.ConfigFile, args.ModuleDir, args.Params)
 	if err != nil {
-		return err
+		return fmt.Errorf("could not load config file %q: %w", args.ConfigFile, err)
 	}
 
-	var binary string
+	var tfBinary string
 	if cfg.TerraformVersion != "" {
 		log.Println("Using Terraform version", cfg.TerraformVersion)
 		cacheDir, err := xdg.CacheFile(filepath.Join("gotf", "terraform", cfg.TerraformVersion))
 		if err != nil {
 			return err
 		}
-		binary = filepath.Join(cacheDir, "terraform")
-		if _, err := os.Stat(binary); err != nil {
+		tfBinary = filepath.Join(cacheDir, "terraform")
+		if _, err := os.Stat(tfBinary); err != nil {
 			if os.IsNotExist(err) {
 				installer := terraform.NewInstaller(urlTemplates, cfg.TerraformVersion, hashicorpPGPKey, cacheDir)
 				if err = installer.Install(); err != nil {
@@ -123,12 +114,12 @@ func Run(args Args) error {
 			log.Println("Terraform version", cfg.TerraformVersion, "already installed.")
 		}
 	} else {
-		binary = "terraform"
+		tfBinary = "terraform"
 	}
 
-	log.Println("Terraform binary:", binary)
+	log.Println("Terraform binary:", tfBinary)
 
 	shell := sh.Shell{}
-	tf := terraform.NewTerraform(cfg, args.ModuleDir, args.Params, shell, binary)
+	tf := terraform.NewTerraform(cfg, args.ModuleDir, args.Params, shell, tfBinary)
 	return tf.Execute(args.Args...)
 }

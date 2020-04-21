@@ -16,7 +16,6 @@ package config
 
 import (
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"path/filepath"
@@ -27,98 +26,206 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type Config struct {
-	TerraformVersion string            `yaml:"terraformVersion"`
-	VarFiles         []string          `yaml:"varFiles"`
-	Vars             map[string]string `yaml:"vars"`
-	Envs             map[string]string `yaml:"envs"`
-	BackendConfigs   map[string]string `yaml:"backendConfigs"`
+type fileConfig struct {
+	TerraformVersion string                       `yaml:"terraformVersion"`
+	RequiredParams   map[string][]string          `yaml:"requiredParams"`
+	Params           map[string]string            `yaml:"params"`
+	GlobalVarFiles   []string                     `yaml:"globalVarFiles"`
+	ModuleVarFiles   map[string][]string          `yaml:"moduleVarFiles"`
+	GlobalVars       map[string]string            `yaml:"globalVars"`
+	ModuleVars       map[string]map[string]string `yaml:"moduleVars"`
+	Envs             map[string]string            `yaml:"envs"`
+	BackendConfigs   map[string]string            `yaml:"backendConfigs"`
 }
 
-func Load(configFile string, moduleDir string, params map[string]string) (*Config, error) {
+type Config struct {
+	TerraformVersion string
+	VarFiles         []string
+	Vars             map[string]string
+	Envs             map[string]string
+	BackendConfigs   map[string]string
+}
+
+const moduleDirParamName = "moduleDir"
+
+func Load(configFile string, modulePath string, cliParams map[string]string) (*Config, error) {
 	log.Println("Loading config file:", configFile)
 	cfgData, err := ioutil.ReadFile(configFile)
 	if err != nil {
-		return nil, fmt.Errorf("could not load config file %q: %w", configFile, err)
+		return nil, err
 	}
 
-	cfg, err := load(cfgData)
-	if err != nil {
-		return nil, fmt.Errorf("could not load config file %q: %w", configFile, err)
-	}
-
-	templatingInput := map[string]interface{}{
-		"Params": params,
-	}
-
-	log.Println("Processing varFiles...")
-	cfgFileDir := filepath.Dir(configFile)
-	cfgFileDirRelativeToModuleDir, err := filepath.Rel(moduleDir, cfgFileDir)
+	fileCfg, err := load(cfgData)
 	if err != nil {
 		return nil, err
 	}
-	for i, f := range cfg.VarFiles {
-		sb := strings.Builder{}
-		err := renderTemplate(&sb, templatingInput, f)
+
+	if err := checkRequiredParams(fileCfg, cliParams); err != nil {
+		return nil, err
+	}
+
+	params := make(map[string]string)
+	if err := appendParams(params, fileCfg.Params); err != nil {
+		return nil, err
+	}
+	if err := appendParams(params, cliParams); err != nil {
+		return nil, err
+	}
+	params[moduleDirParamName] = filepath.Base(modulePath)
+
+	log.Println("Processing var files...")
+	cfgFileDir := filepath.Dir(configFile)
+
+	cfg := &Config{
+		TerraformVersion: fileCfg.TerraformVersion,
+		VarFiles:         []string{},
+		Vars:             make(map[string]string),
+		Envs:             make(map[string]string),
+		BackendConfigs:   make(map[string]string),
+	}
+
+	log.Println("Processing global var files...")
+	for _, f := range fileCfg.GlobalVarFiles {
+		varFilePath, err := computeModuleRelativeVarFilePath(f, params, cfgFileDir, modulePath)
 		if err != nil {
 			return nil, err
 		}
-		varFile := sb.String()
-		if !filepath.IsAbs(f) {
-			varFile = filepath.Join(cfgFileDirRelativeToModuleDir, varFile)
-		}
-		cfg.VarFiles[i] = varFile
+		cfg.VarFiles = append(cfg.VarFiles, varFilePath)
 	}
 
-	log.Println("Processing vars...")
-	for key, value := range cfg.Vars {
-		sb := strings.Builder{}
-		if err := renderTemplate(&sb, templatingInput, value); err != nil {
+	moduleDir := params[moduleDirParamName]
+	if moduleVarFiles, ok := fileCfg.ModuleVarFiles[moduleDir]; ok {
+		log.Println("Processing module var files...")
+		for _, f := range moduleVarFiles {
+			varFilePath, err := computeModuleRelativeVarFilePath(f, params, cfgFileDir, modulePath)
+			if err != nil {
+				return nil, err
+			}
+			cfg.VarFiles = append(cfg.VarFiles, varFilePath)
+		}
+	}
+
+	log.Println("Processing global vars...")
+	for key, value := range fileCfg.GlobalVars {
+		result, err := computeValue(value, params)
+		if err != nil {
 			return nil, err
 		}
-		cfg.Vars[key] = sb.String()
+		cfg.Vars[key] = result
+	}
+
+	if moduleVars, ok := fileCfg.ModuleVars[moduleDir]; ok {
+		log.Println("Processing module vars...")
+		for key, value := range moduleVars {
+			result, err := computeValue(value, params)
+			if err != nil {
+				return nil, err
+			}
+			cfg.Vars[key] = result
+		}
 	}
 
 	log.Println("Processing envs...")
-	for key, value := range cfg.Envs {
-		sb := strings.Builder{}
-		if err := renderTemplate(&sb, templatingInput, value); err != nil {
+	for key, value := range fileCfg.Envs {
+		result, err := computeValue(value, params)
+		if err != nil {
 			return nil, err
 		}
-		cfg.Envs[key] = sb.String()
+		cfg.Envs[key] = result
 	}
 
-	templatingInput = map[string]interface{}{
+	templatingInput := map[string]interface{}{
 		"Vars":   cfg.Vars,
 		"Envs":   cfg.Envs,
 		"Params": params,
 	}
 
-	log.Println("Proessing backendConfigs...")
-	for key, value := range cfg.BackendConfigs {
-		sb := strings.Builder{}
-		if err := renderTemplate(&sb, templatingInput, value); err != nil {
+	log.Println("Processing backend configs...")
+	for key, value := range fileCfg.BackendConfigs {
+		result, err := renderTemplate(templatingInput, value)
+		if err != nil {
 			return nil, err
 		}
-		cfg.BackendConfigs[key] = sb.String()
+		cfg.BackendConfigs[key] = result
 	}
 
 	return cfg, nil
 }
 
-func load(cfgData []byte) (*Config, error) {
-	var cfg Config
+func checkRequiredParams(fileCfg *fileConfig, cliParams map[string]string) error {
+	for k, v := range fileCfg.RequiredParams {
+		value, ok := cliParams[k]
+		if !ok {
+			return fmt.Errorf("required parameter %q must be specified", k)
+		}
+		if len(v) > 0 {
+			var hasAllowedValue bool
+			for _, allowed := range v {
+				if value == allowed {
+					hasAllowedValue = true
+					break
+				}
+			}
+			if !hasAllowedValue {
+				return fmt.Errorf("value for required parameter %q must be one of %v", k, v)
+			}
+		}
+	}
+	return nil
+}
+
+func load(cfgData []byte) (*fileConfig, error) {
+	var cfg fileConfig
 	if err := yaml.Unmarshal(cfgData, &cfg); err != nil {
 		return nil, err
 	}
 	return &cfg, nil
 }
 
-func renderTemplate(wr io.Writer, data map[string]interface{}, text string) error {
+func renderTemplate(data map[string]interface{}, tmpl string) (string, error) {
+	wr := strings.Builder{}
 	tpl := template.New("gotpl").Funcs(sprig.TxtFuncMap()).Option("missingkey=error")
-	tpl, err := tpl.Parse(text)
+	tpl, err := tpl.Parse(tmpl)
 	if err != nil {
-		return err
+		return "", err
 	}
-	return tpl.Execute(wr, data)
+	if err := tpl.Execute(&wr, data); err != nil {
+		return "", err
+	}
+	return wr.String(), nil
+}
+
+func computeModuleRelativeVarFilePath(varFilePathTemplate string, params map[string]string, cfgFileDir string, modulePath string) (string, error) {
+	templatingInput := map[string]interface{}{
+		"Params": params,
+	}
+	varFilePath, err := renderTemplate(templatingInput, varFilePathTemplate)
+	if err != nil {
+		return "", err
+	}
+	if !filepath.IsAbs(varFilePath) {
+		varFilePath := filepath.Join(cfgFileDir, varFilePath)
+		if varFilePath, err = filepath.Rel(modulePath, varFilePath); err != nil {
+			return "", err
+		}
+		return varFilePath, nil
+	}
+	return varFilePath, nil
+}
+
+func computeValue(valueTemplate string, params map[string]string) (string, error) {
+	templatingInput := map[string]interface{}{
+		"Params": params,
+	}
+	return renderTemplate(templatingInput, valueTemplate)
+}
+
+func appendParams(dst map[string]string, src map[string]string) error {
+	for k, v := range src {
+		if k == moduleDirParamName {
+			return fmt.Errorf("param %q is reserved and set automatically", moduleDirParamName)
+		}
+		dst[k] = v
+	}
+	return nil
 }

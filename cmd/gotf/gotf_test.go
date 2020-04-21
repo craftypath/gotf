@@ -20,6 +20,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -35,22 +37,27 @@ func TestExecute(t *testing.T) {
 		runs []testRun
 	}{
 		{
-			name: "happy path",
+			name: "networking module prod",
 			runs: []testRun{
 				{
-					args: []string{"-d", "-c", "testdata/test-config-prod.yaml", "-p", "env=prod", "-m", "testdata/01_testmodule", "init", "-no-color"},
+					args: []string{"-d", "-c", "testdata/test-config.yaml", "-p", "environment=prod", "-m", "testdata/01_networking", "init", "-no-color"},
 					want: []string{"Terraform has been successfully initialized!"},
 				},
 				{
-					args: []string{"-d", "-c", "testdata/test-config-prod.yaml", "-p", "env=prod", "-m", "testdata/01_testmodule", "plan", "-no-color"},
+					args: []string{"-d", "-c", "testdata/test-config.yaml", "-p", "environment=prod", "-m", "testdata/01_networking", "plan", "-input=false", "-no-color"},
 					want: []string{
 						"# null_resource.echo will be created",
 						"Plan: 1 to add, 0 to change, 0 to destroy.",
 					},
 				},
 				{
-					args: []string{"-d", "-c", "testdata/test-config-prod.yaml", "-p", "env=prod", "-m", "testdata/01_testmodule", "apply", "-auto-approve", "-no-color"},
-					want: []string{`foo = 42
+					args: []string{"-d", "-c", "testdata/test-config.yaml", "-p", "environment=prod", "-m", "testdata/01_networking", "apply", "-auto-approve", "-no-color"},
+					want: []string{
+						"State path: .terraform/terraform-networking-prod.tfstate",
+						`bar = module1_prod
+envSpecificVar = prodvalue
+foo = 42
+globalVar = globalvalue
 mapvar = {
   entry1 = {
     value1 = testvalue1
@@ -60,7 +67,46 @@ mapvar = {
     value1 = testvalue2
     value2 = false
   }
-}`},
+}
+myvar = value for networking
+`},
+				},
+			},
+		},
+		{
+			name: "compute module dev",
+			runs: []testRun{
+				{
+					args: []string{"-d", "-c", "testdata/test-config.yaml", "-p", "environment=dev", "-m", "testdata/02_compute", "init", "-no-color"},
+					want: []string{"Terraform has been successfully initialized!"},
+				},
+				{
+					args: []string{"-d", "-c", "testdata/test-config.yaml", "-p", "environment=dev", "-m", "testdata/02_compute", "plan", "-input=false", "-no-color"},
+					want: []string{
+						"# null_resource.echo will be created",
+						"Plan: 1 to add, 0 to change, 0 to destroy.",
+					},
+				},
+				{
+					args: []string{"-d", "-c", "testdata/test-config.yaml", "-p", "environment=dev", "-m", "testdata/02_compute", "apply", "-auto-approve", "-no-color"},
+					want: []string{
+						"State path: .terraform/terraform-compute-dev.tfstate",
+						`bar = module2_dev
+envSpecificVar = devvalue
+foo = 42
+globalVar = globalvalue
+mapvar = {
+  entry1 = {
+    value1 = testvalue1
+    value2 = true
+  }
+  entry2 = {
+    value1 = testvalue2
+    value2 = false
+  }
+}
+myvar = value for compute
+`},
 				},
 			},
 		},
@@ -68,34 +114,34 @@ mapvar = {
 			name: "backend check",
 			runs: []testRun{
 				{
-					args: []string{"-d", "-c", "testdata/test-config-prod.yaml", "-p", "env=prod", "-m", "testdata/01_testmodule", "init", "-no-color"},
+					args: []string{"-d", "-c", "testdata/test-config.yaml", "-p", "environment=prod", "-m", "testdata/01_networking", "init", "-no-color"},
 					want: []string{"Terraform has been successfully initialized!"},
 				},
 				{
-					args: []string{"-d", "-c", "testdata/test-config-prod.yaml", "-p", "env=prod", "-m", "testdata/01_testmodule", "plan", "-no-color"},
+					args: []string{"-d", "-c", "testdata/test-config.yaml", "-p", "environment=prod", "-m", "testdata/01_networking", "plan", "-input=false", "-no-color"},
 					want: []string{
 						"# null_resource.echo will be created",
 						"Plan: 1 to add, 0 to change, 0 to destroy.",
 					},
 				},
 				{
-					args: []string{"-d", "-c", "testdata/test-config-dev.yaml", "-p", "env=dev", "-m", "testdata/01_testmodule", "plan", "-no-color"},
+					args: []string{"-d", "-c", "testdata/test-config.yaml", "-p", "environment=dev", "-m", "testdata/01_networking", "plan", "-input=false", "-no-color"},
 					want: []string{
 						"Configured backend does not match current environment",
-						"Got: .terraform/terraform-testmodule-prod.tfstate",
-						"Want: .terraform/terraform-testmodule-dev.tfstate",
+						"Got: .terraform/terraform-networking-prod.tfstate",
+						"Want: .terraform/terraform-networking-dev.tfstate",
 						"Run terraform init -reconfigure!",
 					},
 					wantErr: true,
 				},
 				{
-					args: []string{"-d", "-c", "testdata/test-config-dev.yaml", "-p", "env=dev", "-m", "testdata/01_testmodule", "init", "-reconfigure"},
+					args: []string{"-d", "-c", "testdata/test-config.yaml", "-p", "environment=dev", "-m", "testdata/01_networking", "init", "-reconfigure"},
 					want: []string{
 						"Terraform has been successfully initialized!",
 					},
 				},
 				{
-					args: []string{"-d", "-c", "testdata/test-config-dev.yaml", "-p", "env=dev", "-m", "testdata/01_testmodule", "plan", "-no-color"},
+					args: []string{"-d", "-c", "testdata/test-config.yaml", "-p", "environment=dev", "-m", "testdata/01_networking", "plan", "-input=false", "-no-color"},
 					want: []string{
 						"# null_resource.echo will be created",
 						"Plan: 1 to add, 0 to change, 0 to destroy.",
@@ -106,20 +152,27 @@ mapvar = {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			os.RemoveAll("testdata/01_testmodule/.terraform")
+			tempDir, err := ioutil.TempDir("testdata", "gotf")
+			t.Cleanup(func() { os.RemoveAll(tempDir) })
 
-			tempDir, err := ioutil.TempDir("", "gotf")
 			panicOnError(err)
-			defer os.RemoveAll(tempDir)
+			panicOnError(os.Setenv("XDG_CACHE_HOME", filepath.Join(tempDir, "tfcache")))
 
-			panicOnError(os.Setenv("XDG_CACHE_HOME", filepath.Join(tempDir, "test")))
+			t.Cleanup(func() {
+				os.RemoveAll("testdata/01_networking/.terraform")
+				os.RemoveAll("testdata/02_compute/.terraform")
+				os.Remove("testdata/01_networking/terraform.tfstate")
+				os.Remove("testdata/02_compute/terraform.tfstate")
+				os.Remove("testdata/01_networking/.terraform.tfstate.lock.info")
+				os.Remove("testdata/02_compute/.terraform.tfstate.lock.info")
+			})
 
 			for _, run := range tt.runs {
 				got, err := runGotf(run.args)
 				if run.wantErr {
-					assert.Error(t, err)
+					require.Error(t, err)
 				} else {
-					assert.NoError(t, err)
+					require.NoError(t, err)
 				}
 				for _, want := range run.want {
 					assert.Contains(t, got, want)
