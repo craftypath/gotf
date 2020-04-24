@@ -127,9 +127,8 @@ myvar = value for compute
 				{
 					args: []string{"-d", "-c", "testdata/test-config.yaml", "-p", "environment=dev", "-m", "testdata/01_networking", "plan", "-input=false", "-no-color"},
 					want: []string{
-						"Configured backend does not match current environment",
-						"Got: .terraform/terraform-networking-prod.tfstate",
-						"Want: .terraform/terraform-networking-dev.tfstate",
+						"configured backend does not match current environment",
+						"path: got=.terraform/terraform-networking-prod.tfstate, want=.terraform/terraform-networking-dev.tfstate",
 						"Run terraform init -reconfigure!",
 					},
 					wantErr: true,
