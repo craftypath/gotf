@@ -26,16 +26,18 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// All maps reresenting YAML dicts are of type map[string]interface{} so Sprig collection
+// functions can be used because they expect this type.
 type fileConfig struct {
-	TerraformVersion string                       `yaml:"terraformVersion"`
-	RequiredParams   map[string][]string          `yaml:"requiredParams"`
-	Params           map[string]string            `yaml:"params"`
-	GlobalVarFiles   []string                     `yaml:"globalVarFiles"`
-	ModuleVarFiles   map[string][]string          `yaml:"moduleVarFiles"`
-	GlobalVars       map[string]string            `yaml:"globalVars"`
-	ModuleVars       map[string]map[string]string `yaml:"moduleVars"`
-	Envs             map[string]string            `yaml:"envs"`
-	BackendConfigs   map[string]string            `yaml:"backendConfigs"`
+	TerraformVersion string                            `yaml:"terraformVersion"`
+	RequiredParams   map[string][]string               `yaml:"requiredParams"`
+	Params           map[string]interface{}            `yaml:"params"`
+	GlobalVarFiles   []string                          `yaml:"globalVarFiles"`
+	ModuleVarFiles   map[string][]string               `yaml:"moduleVarFiles"`
+	GlobalVars       map[string]interface{}            `yaml:"globalVars"`
+	ModuleVars       map[string]map[string]interface{} `yaml:"moduleVars"`
+	Envs             map[string]string                 `yaml:"envs"`
+	BackendConfigs   map[string]string                 `yaml:"backendConfigs"`
 }
 
 type Config struct {
@@ -64,11 +66,11 @@ func Load(configFile string, modulePath string, cliParams map[string]string) (*C
 		return nil, err
 	}
 
-	params := make(map[string]string)
-	if err := appendParams(params, fileCfg.Params); err != nil {
+	params := make(map[string]interface{})
+	if err := appendInterfaceParams(params, fileCfg.Params); err != nil {
 		return nil, err
 	}
-	if err := appendParams(params, cliParams); err != nil {
+	if err := appendStringParams(params, cliParams); err != nil {
 		return nil, err
 	}
 	params[moduleDirParamName] = filepath.Base(modulePath)
@@ -93,7 +95,7 @@ func Load(configFile string, modulePath string, cliParams map[string]string) (*C
 		cfg.VarFiles = append(cfg.VarFiles, varFilePath)
 	}
 
-	moduleDir := params[moduleDirParamName]
+	moduleDir := params[moduleDirParamName].(string)
 	if moduleVarFiles, ok := fileCfg.ModuleVarFiles[moduleDir]; ok {
 		log.Println("Processing module var files...")
 		for _, f := range moduleVarFiles {
@@ -195,7 +197,7 @@ func renderTemplate(data map[string]interface{}, tmpl string) (string, error) {
 	return wr.String(), nil
 }
 
-func computeModuleRelativeVarFilePath(varFilePathTemplate string, params map[string]string, cfgFileDir string, modulePath string) (string, error) {
+func computeModuleRelativeVarFilePath(varFilePathTemplate string, params map[string]interface{}, cfgFileDir string, modulePath string) (string, error) {
 	templatingInput := map[string]interface{}{
 		"Params": params,
 	}
@@ -213,19 +215,39 @@ func computeModuleRelativeVarFilePath(varFilePathTemplate string, params map[str
 	return varFilePath, nil
 }
 
-func computeValue(valueTemplate string, params map[string]string) (string, error) {
-	templatingInput := map[string]interface{}{
-		"Params": params,
+func computeValue(valueTemplate interface{}, params map[string]interface{}) (string, error) {
+	if tmpl, ok := valueTemplate.(string); ok {
+		templatingInput := map[string]interface{}{
+			"Params": params,
+		}
+		return renderTemplate(templatingInput, tmpl)
 	}
-	return renderTemplate(templatingInput, valueTemplate)
+	return fmt.Sprint(valueTemplate), nil
 }
 
-func appendParams(dst map[string]string, src map[string]string) error {
+func appendStringParams(dst map[string]interface{}, src map[string]string) error {
 	for k, v := range src {
-		if k == moduleDirParamName {
-			return fmt.Errorf("param %q is reserved and set automatically", moduleDirParamName)
+		if err := checkforModuleDirParam(k); err != nil {
+			return err
 		}
 		dst[k] = v
+	}
+	return nil
+}
+
+func appendInterfaceParams(dst map[string]interface{}, src map[string]interface{}) error {
+	for k, v := range src {
+		if err := checkforModuleDirParam(k); err != nil {
+			return err
+		}
+		dst[k] = v
+	}
+	return nil
+}
+
+func checkforModuleDirParam(key string) error {
+	if key == moduleDirParamName {
+		return fmt.Errorf("param %q is reserved and set automatically", moduleDirParamName)
 	}
 	return nil
 }
