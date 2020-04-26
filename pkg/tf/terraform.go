@@ -114,7 +114,7 @@ func (tf *Terraform) checkBackendConfig(args ...string) error {
 	}
 
 	backendFile := filepath.Join(tf.moduleDir, ".terraform", "terraform.tfstate")
-	bytes, err := ioutil.ReadFile(backendFile)
+	b, err := ioutil.ReadFile(backendFile)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return nil
@@ -123,22 +123,25 @@ func (tf *Terraform) checkBackendConfig(args ...string) error {
 	}
 
 	var backendJson map[string]interface{}
-	if err := json.Unmarshal(bytes, &backendJson); err != nil {
+	if err := json.Unmarshal(b, &backendJson); err != nil {
 		return err
 	}
 
+	sb := strings.Builder{}
 	for k, v := range tf.config.BackendConfigs {
 		b := backendJson["backend"].(map[string]interface{})
 		c := b["config"].(map[string]interface{})
 		currentVal := c[k]
 		if v != currentVal {
-			return fmt.Errorf(`Configured backend does not match current environment
-Got: %s
-Want: %s
-
-Run terraform init -reconfigure!`, currentVal, v)
+			sb.WriteString(fmt.Sprintf("%s: got=%v, want=%v\n", k, currentVal, v))
 		}
 	}
+
+	if sb.Len() > 0 {
+		sb.WriteString("\nRun terraform init -reconfigure!\n")
+		return fmt.Errorf("configured backend does not match current environment\n\n%s", sb.String())
+	}
+
 	return nil
 }
 
