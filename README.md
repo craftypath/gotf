@@ -27,7 +27,7 @@ $ gotf --help
   ___   __  ____  ____
  / __) /  \(_  _)(  __)
 ( (_ \(  O ) )(   ) _)
- \___/ \__/ (__) (__)   v0.8.0 (commit=1be085d38da8793f117daa3bfc7025c3bd179e5f, date=2020-04-21T11:27:35Z)
+ \___/ \__/ (__) (__)   v0.8.1 (commit=fe1e75dc92af23296cb96af7fdcfee4157998a3b, date=2020-04-26T20:13:53Z)
 
 gotf is a Terraform wrapper facilitating configurations for various environments
 
