@@ -92,7 +92,6 @@ func (tf *Terraform) appendBackendConfigs(env map[string]string) {
 	if len(configs) > 0 {
 		sb := strings.Builder{}
 		for k, v := range configs {
-			env["TF_VAR_backend_"+k] = v
 			if sb.Len() > 0 {
 				sb.WriteString(" ")
 			}
