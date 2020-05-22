@@ -155,7 +155,7 @@ backendConfigs:
 ### Templating
 
 Go templating can be used in the config file as follows.
-The [Sprig](https://masterminds.github.io/sprig/) function library is included.
+Hermetic, i.e. repeatable, functions from the [Sprig](https://masterminds.github.io/sprig/) function library are included.
 
 * In the first templating pass, `globalVarFiles`, `globalVars`, `moduleVarFiles`, `moduleVars`, and `envs` are processed.
   All parameters specified under `params` and using the `-p|--param` flag are available in the `.Params` object.

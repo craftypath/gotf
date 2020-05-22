@@ -186,7 +186,7 @@ func load(cfgData []byte) (*fileConfig, error) {
 
 func renderTemplate(data map[string]interface{}, tmpl string) (string, error) {
 	wr := strings.Builder{}
-	tpl := template.New("gotpl").Funcs(sprig.TxtFuncMap()).Option("missingkey=error")
+	tpl := template.New("gotpl").Funcs(sprig.HermeticTxtFuncMap()).Option("missingkey=error")
 	tpl, err := tpl.Parse(tmpl)
 	if err != nil {
 		return "", err
