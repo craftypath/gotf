@@ -27,7 +27,7 @@ $ gotf --help
   ___   __  ____  ____
  / __) /  \(_  _)(  __)
 ( (_ \(  O ) )(   ) _)
- \___/ \__/ (__) (__)   v0.9.0 (commit=b5c05ca405674796fc76f330fd09e95ebe9fd6cd, date=2020-05-08T17:23:58Z)
+ \___/ \__/ (__) (__)   v0.9.2 (commit=e77deab, date=2020-06-05T09:46:48Z)
 
 gotf is a Terraform wrapper facilitating configurations for various environments
 
@@ -40,7 +40,7 @@ Flags:
   -h, --help                help for gotf
   -m, --module-dir string   The module directory to run Terraform in
   -p, --params key=value    Params for templating in the config file. May be specified multiple times (default map[])
-      --version             version for gotf
+  -v, --version             version for gotf
 ```
 
 ## Demo
@@ -103,7 +103,7 @@ Backend configuration added as `-backend-config` CLI options when the Terraform 
 ### Example
 
 ```yaml
-terraformVersion: 0.12.24
+terraformVersion: 0.12.26
 
 requiredParams:
   environment:
@@ -179,7 +179,7 @@ $ gotf -c example-config.yaml -p environment=dev -m 01_networking init
 After processing, the config file would look like this:
 
 ```yaml
-terraformVersion: 0.12.24
+terraformVersion: 0.12.26
 
 requiredParams:
   environment:
@@ -247,13 +247,13 @@ gotf> Processing global vars...
 gotf> Processing module vars...
 gotf> Processing envs...
 gotf> Processing backend configs...
-gotf> Using Terraform version 0.12.24
-gotf> Terraform version 0.12.24 already installed.
-gotf> Terraform binary: /Users/myuser/Library/Caches/gotf/terraform/0.12.24/terraform
+gotf> Using Terraform version 0.12.26
+gotf> Terraform version 0.12.26 already installed.
+gotf> Terraform binary: /Users/myuser/Library/Caches/gotf/terraform/0.12.26/terraform
 gotf>
 gotf> Terraform command-line:
 gotf> -----------------------
-gotf> /Users/myuser/Library/Caches/gotf/terraform/0.12.24/terraform init -no-color
+gotf> /Users/myuser/Library/Caches/gotf/terraform/0.12.26/terraform init -no-color
 gotf>
 gotf> Terraform environment:
 gotf> ----------------------
