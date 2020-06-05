@@ -15,7 +15,6 @@
 package gotf
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -59,12 +58,6 @@ func newGotfCommand() *cobra.Command {
 gotf is a Terraform wrapper facilitating configurations for various environments
 `, fullVersion),
 		Version: fullVersion,
-		Args: func(cmd *cobra.Command, args []string) error {
-			if len(args) < 1 {
-				return errors.New("no arguments for Terraform specified")
-			}
-			return nil
-		},
 		RunE: func(command *cobra.Command, args []string) error {
 			return gotf.Run(gotf.Args{
 				Debug:      debug,
