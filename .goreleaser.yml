@@ -15,7 +15,7 @@ builds:
     ldflags:
       - >-
         -X github.com/craftypath/gotf/pkg/gotf.Version={{ .Tag }}
-        -X github.com/craftypath/gotf/pkg/gotf.GitCommit={{ .Commit }}
+        -X github.com/craftypath/gotf/pkg/gotf.GitCommit={{ .ShortCommit }}
         -X github.com/craftypath/gotf/pkg/gotf.BuildDate={{ .Date }}
 checksum:
   name_template: 'checksums.txt'
