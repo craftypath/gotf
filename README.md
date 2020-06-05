@@ -43,6 +43,11 @@ Flags:
       --version             version for gotf
 ```
 
+## Demo
+
+Check out the [demo](demo) project which does not use cloud providers and keeps state locally.
+This allows you to play with the tool on your local machine.
+
 ## Configuration
 
 `gotf` is configured via config file.

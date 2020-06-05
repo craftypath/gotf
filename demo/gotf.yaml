@@ -1,0 +1,29 @@
+terraformVersion: 0.12.26
+
+requiredParams:
+  environment:
+    - dev
+    - prod
+
+globalVarFiles:
+  - global-vars-{{ .Params.environment }}.tfvars
+
+globalVars:
+  state_file_name: '{{ (splitn "_" 2 .Params.moduleDir)._1 }}.tfstate'
+
+moduleVarFiles:
+  01_first:
+    - 01_first/vars-{{ .Params.environment }}.tfvars
+  02_second:
+    - 02_second/vars-{{ .Params.environment }}.tfvars
+
+moduleVars:
+  01_first:
+    module_specific_messages: |-
+      [
+        "Hello from module {{ .Params.moduleDir }}!",
+        "gotf is cool!",
+      ]
+
+backendConfigs:
+  path: .tfstate/{{ .Params.environment }}/{{ .Vars.state_file_name }}
