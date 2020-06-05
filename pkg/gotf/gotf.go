@@ -15,6 +15,7 @@
 package gotf
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -80,6 +81,10 @@ type Args struct {
 }
 
 func Run(args Args) error {
+	if len(args.Args) == 0 {
+		return errors.New("no arguments for Terraform specified")
+	}
+
 	if args.Debug {
 		log.SetOutput(os.Stderr)
 		log.SetFlags(0)
