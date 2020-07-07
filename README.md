@@ -48,6 +48,12 @@ Flags:
 Check out the [demo](demo) project which does not use cloud providers and keeps state locally.
 This allows you to play with the tool on your local machine.
 
+## Talks
+
+<a href="https://www.youtube.com/watch?v=Tel-9m5_MSc&list=PLD9VybHH2wnYtuaiEcjMH5n2gTgNSDYAV" target="_blank"><img src="https://i.ytimg.com/vi/Tel-9m5_MSc/maxresdefault.jpg"
+alt="🇩🇪 gotf – Umgebungen mit Terraform einfacher managen | Reinhard von codecentric auf der #SoftwerkerKonf" width="240" height="135" border="10" /></a><br>
+**🇩🇪 gotf – Umgebungen mit Terraform einfacher managen | Reinhard von codecentric auf der #SoftwerkerKonf**
+
 ## Configuration
 
 `gotf` is configured via config file.
