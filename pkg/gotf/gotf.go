@@ -73,11 +73,12 @@ oEIgXTMyCILo34Fa/C6VCm2WBgz9zZO8/rHIiQm1J5zqz0DrDwKBUM9C
 )
 
 type Args struct {
-	Debug      bool
-	ConfigFile string
-	ModuleDir  string
-	Params     map[string]string
-	Args       []string
+	Debug            bool
+	ConfigFile       string
+	ModuleDir        string
+	Params           map[string]string
+	SkipBackendCheck bool
+	Args             []string
 }
 
 func Run(args Args) error {
@@ -125,6 +126,6 @@ func Run(args Args) error {
 	log.Println("Terraform binary:", tfBinary)
 
 	shell := sh.Shell{}
-	tf := terraform.NewTerraform(cfg, args.ModuleDir, args.Params, shell, tfBinary)
+	tf := terraform.NewTerraform(cfg, args.ModuleDir, args.Params, args.SkipBackendCheck, shell, tfBinary)
 	return tf.Execute(args.Args...)
 }

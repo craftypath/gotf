@@ -44,6 +44,7 @@ func newGotfCommand() *cobra.Command {
 	params := opts.NewMapOpts()
 	var debug bool
 	var moduleDir string
+	var skipBackendCheck bool
 
 	fullVersion := fmt.Sprintf("%s (commit=%s, date=%s)", gotf.Version, gotf.GitCommit, gotf.BuildDate)
 	command := &cobra.Command{
@@ -60,11 +61,12 @@ gotf is a Terraform wrapper facilitating configurations for various environments
 		Version: fullVersion,
 		RunE: func(command *cobra.Command, args []string) error {
 			return gotf.Run(gotf.Args{
-				Debug:      debug,
-				ConfigFile: cfgFile,
-				ModuleDir:  moduleDir,
-				Params:     params.GetAll(),
-				Args:       args,
+				Debug:            debug,
+				ConfigFile:       cfgFile,
+				ModuleDir:        moduleDir,
+				Params:           params.GetAll(),
+				SkipBackendCheck: skipBackendCheck,
+				Args:             args,
 			})
 		},
 	}
@@ -73,6 +75,7 @@ gotf is a Terraform wrapper facilitating configurations for various environments
 	command.Flags().VarP(params, "params", "p", "Params for templating in the config file. May be specified multiple times")
 	command.Flags().BoolVarP(&debug, "debug", "d", false, "Print additional debug output to stderr")
 	command.Flags().StringVarP(&moduleDir, "module-dir", "m", "", "The module directory to run Terraform in")
+	command.Flags().BoolVarP(&skipBackendCheck, "skip-backend-check", "s", false, "Skip checking for changed backend configuration")
 	command.Flags().SetInterspersed(false)
 	command.SetVersionTemplate("{{ .Version }}\n")
 	command.SilenceUsage = true

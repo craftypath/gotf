@@ -31,23 +31,25 @@ type (
 	}
 
 	Terraform struct {
-		config     *config.Config
-		params     map[string]string
-		moduleDir  string
-		shell      Shell
-		binaryPath string
+		config           *config.Config
+		params           map[string]string
+		moduleDir        string
+		skipBackendCheck bool
+		shell            Shell
+		binaryPath       string
 	}
 )
 
 var commandsWithVars = []string{"apply", "destroy", "plan", "refresh", "import"}
 
-func NewTerraform(config *config.Config, moduleDir string, params map[string]string, shell Shell, binaryPath string) *Terraform {
+func NewTerraform(config *config.Config, moduleDir string, params map[string]string, skipBackendCheck bool, shell Shell, binaryPath string) *Terraform {
 	return &Terraform{
-		config:     config,
-		params:     params,
-		shell:      shell,
-		moduleDir:  moduleDir,
-		binaryPath: binaryPath,
+		config:           config,
+		params:           params,
+		shell:            shell,
+		moduleDir:        moduleDir,
+		skipBackendCheck: skipBackendCheck,
+		binaryPath:       binaryPath,
 	}
 }
 
@@ -58,8 +60,10 @@ func (tf *Terraform) Execute(args ...string) error {
 	tf.appendVarArgs(env)
 	tf.appendBackendConfigs(env)
 
-	if err := tf.checkBackendConfig(args...); err != nil {
-		return err
+	if !tf.skipBackendCheck {
+		if err := tf.checkBackendConfig(args...); err != nil {
+			return err
+		}
 	}
 	return tf.shell.Execute(env, tf.moduleDir, tf.binaryPath, args...)
 }
