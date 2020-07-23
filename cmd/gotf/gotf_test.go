@@ -148,6 +148,28 @@ myvar = value for compute
 				},
 			},
 		},
+		{
+			name: "skip backend check",
+			runs: []testRun{
+				{
+					args: []string{"-d", "-c", "testdata/test-config.yaml", "-p", "environment=prod", "-m", "testdata/01_networking", "init", "-no-color"},
+					want: []string{"Terraform has been successfully initialized!"},
+				},
+				{
+					args: []string{"-d", "-c", "testdata/test-config.yaml", "-p", "environment=prod", "-m", "testdata/01_networking", "plan", "-input=false", "-no-color"},
+					want: []string{
+						"# null_resource.echo will be created",
+						"Plan: 1 to add, 0 to change, 0 to destroy.",
+					},
+				},
+				{
+					args: []string{"-d", "--skip-backend-check", "-c", "testdata/test-config.yaml", "-p", "environment=dev", "-m", "testdata/01_networking", "init", "-no-color"},
+					want: []string{
+						"Backend configuration changed!",
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
