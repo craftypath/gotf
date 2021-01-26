@@ -3,7 +3,7 @@ module github.com/craftypath/gotf
 go 1.14
 
 require (
-	github.com/Masterminds/sprig/v3 v3.1.0
+	github.com/Masterminds/sprig/v3 v3.2.0
 	github.com/adrg/xdg v0.3.0
 	github.com/golangci/golangci-lint v1.36.0
 	github.com/goreleaser/goreleaser v0.133.0
