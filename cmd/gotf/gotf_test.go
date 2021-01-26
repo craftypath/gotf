@@ -54,11 +54,12 @@ func TestExecute(t *testing.T) {
 					args: []string{"-d", "-c", "testdata/test-config.yaml", "-p", "environment=prod", "-m", "testdata/01_networking", "apply", "-auto-approve", "-no-color"},
 					want: []string{
 						"State path: .terraform/terraform-networking-prod.tfstate",
-						`bar = module1_prod
-envSpecificVar = prodvalue
-foo = 42
-globalVar = globalvalue
-mapvar = {
+						`bar = "module1_prod"
+envSpecificVar = "prodvalue"
+foo = "42"
+globalVar = "globalvalue"
+mapvar = <<EOT
+{
   entry1 = {
     value1 = testvalue1
     value2 = true
@@ -68,7 +69,8 @@ mapvar = {
     value2 = false
   }
 }
-myvar = value for networking
+EOT
+myvar = "value for networking"
 `},
 				},
 			},
@@ -91,11 +93,12 @@ myvar = value for networking
 					args: []string{"-d", "-c", "testdata/test-config.yaml", "-p", "environment=dev", "-m", "testdata/02_compute", "apply", "-auto-approve", "-no-color"},
 					want: []string{
 						"State path: .terraform/terraform-compute-dev.tfstate",
-						`bar = module2_dev
-envSpecificVar = devvalue
-foo = 42
-globalVar = globalvalue
-mapvar = {
+						`bar = "module2_dev"
+envSpecificVar = "devvalue"
+foo = "42"
+globalVar = "globalvalue"
+mapvar = <<EOT
+{
   entry1 = {
     value1 = testvalue1
     value2 = true
@@ -105,7 +108,8 @@ mapvar = {
     value2 = false
   }
 }
-myvar = value for compute
+EOT
+myvar = "value for compute"
 `},
 				},
 			},
@@ -182,10 +186,8 @@ myvar = value for compute
 			t.Cleanup(func() {
 				os.RemoveAll("testdata/01_networking/.terraform")
 				os.RemoveAll("testdata/02_compute/.terraform")
-				os.Remove("testdata/01_networking/terraform.tfstate")
-				os.Remove("testdata/02_compute/terraform.tfstate")
-				os.Remove("testdata/01_networking/.terraform.tfstate.lock.info")
-				os.Remove("testdata/02_compute/.terraform.tfstate.lock.info")
+				os.Remove("testdata/01_networking/.terraform.lock.hcl")
+				os.Remove("testdata/02_compute/.terraform.lock.hcl")
 			})
 
 			for _, run := range tt.runs {

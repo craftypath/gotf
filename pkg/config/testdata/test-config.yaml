@@ -1,4 +1,6 @@
-terraformVersion: "0.12.24"
+terraformVersion: 0.14.5
+
+ignoreMissingVarFiles: true
 
 requiredParams:
   environment:
@@ -23,9 +25,11 @@ moduleVarFiles:
   testmodule2:
     - testmodule2/test1-{{ .Params.environment }}.tfvars
     - testmodule2/test2-{{ .Params.environment }}.tfvars
+    - testmodule2/test2-does-not-exist.tfvars
 
 globalVarFiles:
   - global.tfvars
+  - global-does-not-exist.tfvars
   - global-{{ .Params.environment }}.tfvars
 
 globalVars:

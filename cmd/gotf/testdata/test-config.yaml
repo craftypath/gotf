@@ -1,4 +1,6 @@
-terraformVersion: 0.12.24
+terraformVersion: 0.14.5
+
+ignoreMissingVarFiles: true
 
 requiredParams:
   environment:
@@ -11,6 +13,7 @@ params:
 globalVarFiles:
   - global-{{ .Params.environment }}.tfvars
   - global.tfvars
+  - global-does-not-exists.tfvars
 
 globalVars:
   foo: 42
@@ -34,6 +37,7 @@ moduleVarFiles:
     - 01_networking/{{ .Params.environment }}.tfvars
   02_compute:
     - 02_compute/{{ .Params.environment }}.tfvars
+    - 02_compute/does-not-exist.tfvars
 
 moduleVars:
   01_networking:
