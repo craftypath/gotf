@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"path/filepath"
 	"strings"
 	"text/template"
@@ -29,15 +30,16 @@ import (
 // All maps reresenting YAML dicts are of type map[string]interface{} so Sprig collection
 // functions can be used because they expect this type.
 type fileConfig struct {
-	TerraformVersion string                            `yaml:"terraformVersion"`
-	RequiredParams   map[string][]string               `yaml:"requiredParams"`
-	Params           map[string]interface{}            `yaml:"params"`
-	GlobalVarFiles   []string                          `yaml:"globalVarFiles"`
-	ModuleVarFiles   map[string][]string               `yaml:"moduleVarFiles"`
-	GlobalVars       map[string]interface{}            `yaml:"globalVars"`
-	ModuleVars       map[string]map[string]interface{} `yaml:"moduleVars"`
-	Envs             map[string]string                 `yaml:"envs"`
-	BackendConfigs   map[string]string                 `yaml:"backendConfigs"`
+	TerraformVersion      string                            `yaml:"terraformVersion"`
+	RequiredParams        map[string][]string               `yaml:"requiredParams"`
+	Params                map[string]interface{}            `yaml:"params"`
+	GlobalVarFiles        []string                          `yaml:"globalVarFiles"`
+	ModuleVarFiles        map[string][]string               `yaml:"moduleVarFiles"`
+	GlobalVars            map[string]interface{}            `yaml:"globalVars"`
+	ModuleVars            map[string]map[string]interface{} `yaml:"moduleVars"`
+	Envs                  map[string]string                 `yaml:"envs"`
+	BackendConfigs        map[string]string                 `yaml:"backendConfigs"`
+	IgnoreMissingVarFiles bool                              `yaml:"ignoreMissingVarFiles"`
 }
 
 type Config struct {
@@ -92,7 +94,9 @@ func Load(configFile string, modulePath string, cliParams map[string]string) (*C
 		if err != nil {
 			return nil, err
 		}
-		cfg.VarFiles = append(cfg.VarFiles, varFilePath)
+		if err := maybeAppendValFile(cfg, fileCfg.IgnoreMissingVarFiles, varFilePath, modulePath); err != nil {
+			return nil, err
+		}
 	}
 
 	moduleDir := params[moduleDirParamName].(string)
@@ -103,7 +107,9 @@ func Load(configFile string, modulePath string, cliParams map[string]string) (*C
 			if err != nil {
 				return nil, err
 			}
-			cfg.VarFiles = append(cfg.VarFiles, varFilePath)
+			if err := maybeAppendValFile(cfg, fileCfg.IgnoreMissingVarFiles, varFilePath, modulePath); err != nil {
+				return nil, err
+			}
 		}
 	}
 
@@ -152,6 +158,26 @@ func Load(configFile string, modulePath string, cliParams map[string]string) (*C
 	}
 
 	return cfg, nil
+}
+
+func maybeAppendValFile(cfg *Config, ignoreMissingVarFiles bool, varFilePath string, modulePath string) error {
+	if ignoreMissingVarFiles {
+		var path string
+		if filepath.IsAbs(varFilePath) {
+			path = varFilePath
+		} else {
+			path = filepath.Join(modulePath, varFilePath)
+		}
+		_, err := os.Stat(path)
+		if err != nil {
+			if os.IsNotExist(err) {
+				log.Println(fmt.Sprintf("File %s does not exist. Ignoring it.", path))
+				return nil
+			}
+		}
+	}
+	cfg.VarFiles = append(cfg.VarFiles, varFilePath)
+	return nil
 }
 
 func checkRequiredParams(fileCfg *fileConfig, cliParams map[string]string) error {
