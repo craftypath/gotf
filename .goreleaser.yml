@@ -29,7 +29,7 @@ archives:
       - LICENSE
       - README.md
 brews:
-  - github:
+  - tap:
       owner: craftypath
       name: homebrew-tap
     commit_author:
