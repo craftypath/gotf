@@ -8,7 +8,7 @@ require (
 	github.com/golangci/golangci-lint v1.36.0
 	github.com/goreleaser/goreleaser v0.133.0
 	github.com/magefile/mage v1.11.0
-	github.com/mholt/archiver/v3 v3.3.0
+	github.com/mholt/archiver/v3 v3.5.0
 	github.com/spf13/cobra v1.1.1
 	github.com/stretchr/testify v1.7.0
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
