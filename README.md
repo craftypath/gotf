@@ -27,7 +27,7 @@ $ gotf --help
   ___   __  ____  ____
  / __) /  \(_  _)(  __)
 ( (_ \(  O ) )(   ) _)
- \___/ \__/ (__) (__)   v0.9.2 (commit=e77deab, date=2020-06-05T09:46:48Z)
+ \___/ \__/ (__) (__)   v0.11.0 (commit=634e3fb, date=2021-01-27T20:18:21Z)
 
 gotf is a Terraform wrapper facilitating configurations for various environments
 
@@ -106,10 +106,14 @@ Environment variables to be added to the Terraform process.
 
 Backend configuration added as `-backend-config` CLI options when the Terraform `init` command is run.
 
+#### `ignoreMissingVarFiles`
+
+If set to `true`, gotf checks whether configured variable files exist and does not pass them to Terraform if they don't.
+
 ### Example
 
 ```yaml
-terraformVersion: 0.12.26
+terraformVersion: 0.14.5
 
 requiredParams:
   environment:
@@ -185,7 +189,7 @@ $ gotf -c example-config.yaml -p environment=dev -m 01_networking init
 After processing, the config file would look like this:
 
 ```yaml
-terraformVersion: 0.12.26
+terraformVersion: 0.14.5
 
 requiredParams:
   environment:
@@ -253,13 +257,13 @@ gotf> Processing global vars...
 gotf> Processing module vars...
 gotf> Processing envs...
 gotf> Processing backend configs...
-gotf> Using Terraform version 0.12.26
-gotf> Terraform version 0.12.26 already installed.
-gotf> Terraform binary: /Users/myuser/Library/Caches/gotf/terraform/0.12.26/terraform
+gotf> Using Terraform version 0.14.5
+gotf> Terraform version 0.14.5 already installed.
+gotf> Terraform binary: /Users/myuser/Library/Caches/gotf/terraform/0.14.5/terraform
 gotf>
 gotf> Terraform command-line:
 gotf> -----------------------
-gotf> /Users/myuser/Library/Caches/gotf/terraform/0.12.26/terraform init -no-color
+gotf> /Users/myuser/Library/Caches/gotf/terraform/0.14.5/terraform init -no-color
 gotf>
 gotf> Terraform environment:
 gotf> ----------------------
