@@ -9,7 +9,7 @@ require (
 	github.com/goreleaser/goreleaser v0.155.0
 	github.com/magefile/mage v1.11.0
 	github.com/mholt/archiver/v3 v3.5.0
-	github.com/spf13/cobra v1.1.1
+	github.com/spf13/cobra v1.1.2
 	github.com/stretchr/testify v1.7.0
 	golang.org/x/crypto v0.0.0-20201208171446-5f87f3452ae9
 	golang.org/x/tools v0.0.0-20210105210202-9ed45478a130
