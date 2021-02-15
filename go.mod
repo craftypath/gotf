@@ -6,7 +6,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.2
 	github.com/adrg/xdg v0.3.0
 	github.com/golangci/golangci-lint v1.36.0
-	github.com/goreleaser/goreleaser v0.155.0
+	github.com/goreleaser/goreleaser v0.155.2
 	github.com/magefile/mage v1.11.0
 	github.com/mholt/archiver/v3 v3.5.0
 	github.com/spf13/cobra v1.1.3
