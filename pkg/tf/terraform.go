@@ -34,6 +34,7 @@ type (
 		config           *config.Config
 		params           map[string]string
 		moduleDir        string
+		noVars           bool
 		skipBackendCheck bool
 		shell            Shell
 		binaryPath       string
@@ -42,13 +43,14 @@ type (
 
 var commandsWithVars = []string{"apply", "destroy", "plan", "refresh", "import"}
 
-func NewTerraform(config *config.Config, moduleDir string, params map[string]string, skipBackendCheck bool, shell Shell, binaryPath string) *Terraform {
+func NewTerraform(config *config.Config, moduleDir string, params map[string]string, skipBackendCheck bool, noVars bool, shell Shell, binaryPath string) *Terraform {
 	return &Terraform{
 		config:           config,
 		params:           params,
 		shell:            shell,
 		moduleDir:        moduleDir,
 		skipBackendCheck: skipBackendCheck,
+		noVars:           noVars,
 		binaryPath:       binaryPath,
 	}
 }
@@ -56,9 +58,11 @@ func NewTerraform(config *config.Config, moduleDir string, params map[string]str
 func (tf *Terraform) Execute(args ...string) error {
 	env := map[string]string{}
 	stringMapAppend(env, tf.config.Envs)
-	tf.appendVarFileArgs(env)
-	tf.appendVarArgs(env)
-	tf.appendBackendConfigs(env)
+	if !tf.noVars {
+		tf.appendVarFileArgs(env)
+		tf.appendVarArgs(env)
+		tf.appendBackendConfigs(env)
+	}
 
 	if !tf.skipBackendCheck {
 		if err := tf.checkBackendConfig(args...); err != nil {

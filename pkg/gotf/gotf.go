@@ -78,6 +78,7 @@ type Args struct {
 	ModuleDir        string
 	Params           map[string]string
 	SkipBackendCheck bool
+	NoVars           bool
 	Args             []string
 }
 
@@ -126,6 +127,6 @@ func Run(args Args) error {
 	log.Println("Terraform binary:", tfBinary)
 
 	shell := sh.Shell{}
-	tf := terraform.NewTerraform(cfg, args.ModuleDir, args.Params, args.SkipBackendCheck, shell, tfBinary)
+	tf := terraform.NewTerraform(cfg, args.ModuleDir, args.Params, args.SkipBackendCheck, args.NoVars, shell, tfBinary)
 	return tf.Execute(args.Args...)
 }
