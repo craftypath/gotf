@@ -174,6 +174,28 @@ myvar = "value for compute"
 				},
 			},
 		},
+		{
+			name: "no-vars",
+			runs: []testRun{
+				{
+					args: []string{"-d", "-c", "testdata/test-config.yaml", "-p", "environment=dev", "-m", "testdata/01_networking", "init", "-no-color"},
+					want: []string{"Terraform has been successfully initialized!"},
+				},
+				{
+					args: []string{"-d", "-c", "testdata/test-config.yaml", "-p", "environment=dev", "-m", "testdata/01_networking", "plan", "-input=false", "-no-color", "-out=plan.out"},
+					want: []string{
+						"# null_resource.echo will be created",
+						"Plan: 1 to add, 0 to change, 0 to destroy.",
+					},
+				},
+				{
+					args: []string{"-d", "-c", "testdata/test-config.yaml", "-p", "environment=dev", "-m", "testdata/01_networking", "--no-vars", "apply", "-no-color", "plan.out"},
+					want: []string{
+						"Apply complete!",
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -185,7 +207,9 @@ myvar = "value for compute"
 
 			t.Cleanup(func() {
 				os.RemoveAll("testdata/01_networking/.terraform")
+				os.RemoveAll("testdata/01_networking/plan.out")
 				os.RemoveAll("testdata/02_compute/.terraform")
+				os.RemoveAll("testdata/02_compute/plan.out")
 				os.Remove("testdata/01_networking/.terraform.lock.hcl")
 				os.Remove("testdata/02_compute/.terraform.lock.hcl")
 			})
