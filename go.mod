@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	github.com/Masterminds/sprig/v3 v3.2.2
-	github.com/adrg/xdg v0.3.1
+	github.com/adrg/xdg v0.3.2
 	github.com/golangci/golangci-lint v1.38.0
 	github.com/goreleaser/goreleaser v0.159.0
 	github.com/magefile/mage v1.11.0
