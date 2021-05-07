@@ -72,7 +72,7 @@ func TestInstaller_Install(t *testing.T) {
 		SHA256SumsFile:          "file://./testdata/test_%s_SHA256SUMS",
 		SHA256SumsSignatureFile: "file://./testdata/test_%s_SHA256SUMS.sig",
 	}
-	installer := NewInstaller(urlTemplates, "0.42.0", testGPGPublicKey, dir)
+	installer := NewInstaller(urlTemplates, "0.42.0", [][]byte{testGPGPublicKey}, dir)
 	installer.httpClient = httpClient
 
 	err = installer.Install()
