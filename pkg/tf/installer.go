@@ -31,6 +31,8 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/hashicorp/go-multierror"
+
 	"github.com/mholt/archiver/v3"
 	"golang.org/x/crypto/openpgp"
 )
@@ -42,20 +44,20 @@ type URLTemplates struct {
 }
 
 type Installer struct {
-	urlTemplates *URLTemplates
-	version      string
-	gpgPublicKey []byte
-	dstDir       string
-	httpClient   *http.Client
+	urlTemplates  *URLTemplates
+	version       string
+	gpgPublicKeys [][]byte
+	dstDir        string
+	httpClient    *http.Client
 }
 
-func NewInstaller(urlTemplates *URLTemplates, version string, gpgPublicKey []byte, dstDir string) *Installer {
+func NewInstaller(urlTemplates *URLTemplates, version string, gpgPublicKeys [][]byte, dstDir string) *Installer {
 	return &Installer{
-		urlTemplates: urlTemplates,
-		version:      version,
-		gpgPublicKey: gpgPublicKey,
-		dstDir:       dstDir,
-		httpClient:   http.DefaultClient,
+		urlTemplates:  urlTemplates,
+		version:       version,
+		gpgPublicKeys: gpgPublicKeys,
+		dstDir:        dstDir,
+		httpClient:    http.DefaultClient,
 	}
 }
 
@@ -126,27 +128,32 @@ func (i *Installer) download(url string) (string, error) {
 }
 
 func (i *Installer) verifyGPGSignature(targetFilePath string, signatureFilePath string) error {
-	signature, err := os.Open(signatureFilePath)
+	signature, err := os.ReadFile(signatureFilePath)
 	if err != nil {
 		return err
 	}
 
-	target, err := os.Open(targetFilePath)
+	target, err := os.ReadFile(targetFilePath)
 	if err != nil {
 		return err
 	}
 
-	r := bytes.NewReader(i.gpgPublicKey)
-	keyring, err := openpgp.ReadArmoredKeyRing(r)
-	if err != nil {
-		return err
+	var result error
+
+	for _, key := range i.gpgPublicKeys {
+		r := bytes.NewReader(key)
+		keyring, err := openpgp.ReadArmoredKeyRing(r)
+		if err != nil {
+			return err
+		}
+		if _, err := openpgp.CheckDetachedSignature(keyring, bytes.NewReader(target), bytes.NewReader(signature)); err != nil {
+			result = multierror.Append(result, err)
+			continue
+		}
+		return nil
 	}
 
-	if _, err := openpgp.CheckDetachedSignature(keyring, target, signature); err != nil {
-		return err
-	}
-
-	return nil
+	return result
 }
 
 func (i *Installer) verifySHA256sum(targetFilePath string, sha256sumsFilePath string) error {
