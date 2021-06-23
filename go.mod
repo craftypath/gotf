@@ -5,7 +5,7 @@ go 1.16
 require (
 	github.com/Masterminds/sprig/v3 v3.2.2
 	github.com/adrg/xdg v0.3.3
-	github.com/golangci/golangci-lint v1.40.0
+	github.com/golangci/golangci-lint v1.41.1
 	github.com/goreleaser/goreleaser v0.164.0
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/magefile/mage v1.11.0
