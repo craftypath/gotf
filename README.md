@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) ![CI](https://github.com/craftypath/gotf/workflows/CI/badge.svg?branch=master&event=push)
 
-`gotf` is a Terraform wrapper that makes it easy to support multiple configurations, e. g. for different environments.
+`gotf` is a Terraform wrapper that makes it easy to support multiple configurations, e.g. for different environments.
 
 ## Installation
 
@@ -27,7 +27,7 @@ $ gotf --help
   ___   __  ____  ____
  / __) /  \(_  _)(  __)
 ( (_ \(  O ) )(   ) _)
- \___/ \__/ (__) (__)   v0.12.0 (commit=6f249fd, date=2021-03-09T20:21:43Z)
+ \___/ \__/ (__) (__)   v0.13.0 (commit=77e3ad0, date=2021-05-07T22:03:44Z)
 
 gotf is a Terraform wrapper facilitating configurations for various environments
 
@@ -260,13 +260,13 @@ gotf> Processing global vars...
 gotf> Processing module vars...
 gotf> Processing envs...
 gotf> Processing backend configs...
-gotf> Using Terraform version 0.14.5
-gotf> Terraform version 0.14.5 already installed.
-gotf> Terraform binary: /Users/myuser/Library/Caches/gotf/terraform/0.14.5/terraform
+gotf> Using Terraform version 1.0.9
+gotf> Terraform version 1.0.9 already installed.
+gotf> Terraform binary: /Users/myuser/Library/Caches/gotf/terraform/1.0.9/terraform
 gotf>
 gotf> Terraform command-line:
 gotf> -----------------------
-gotf> /Users/myuser/Library/Caches/gotf/terraform/0.14.5/terraform init -no-color
+gotf> /Users/myuser/Library/Caches/gotf/terraform/1.0.9/terraform init -no-color
 gotf>
 gotf> Terraform environment:
 gotf> ----------------------
