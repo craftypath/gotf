@@ -34,7 +34,7 @@ import (
 	"github.com/hashicorp/go-multierror"
 
 	"github.com/mholt/archiver/v3"
-	"golang.org/x/crypto/openpgp"
+	"golang.org/x/crypto/openpgp" //nolint:staticcheck
 )
 
 type URLTemplates struct {
