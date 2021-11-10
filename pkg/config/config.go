@@ -75,7 +75,13 @@ func Load(configFile string, modulePath string, cliParams map[string]string) (*C
 	if err := appendStringParams(params, cliParams); err != nil {
 		return nil, err
 	}
-	params[moduleDirParamName] = filepath.Base(modulePath)
+
+	// we need the absolute path here in case "." was specified as relative path
+	abs, err := filepath.Abs(modulePath)
+	if err != nil {
+		return nil, err
+	}
+	params[moduleDirParamName] = filepath.Base(abs)
 
 	log.Println("Processing var files...")
 	cfgFileDir := filepath.Dir(configFile)

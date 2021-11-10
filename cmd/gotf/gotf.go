@@ -16,7 +16,6 @@ package gotf
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 
@@ -76,15 +75,12 @@ gotf is a Terraform wrapper facilitating configurations for various environments
 	command.Flags().StringVarP(&cfgFile, "config", "c", "gotf.yaml", "Config file to be used")
 	command.Flags().VarP(params, "params", "p", "Params for templating in the config file. May be specified multiple times")
 	command.Flags().BoolVarP(&debug, "debug", "d", false, "Print additional debug output to stderr")
-	command.Flags().StringVarP(&moduleDir, "module-dir", "m", "", "The module directory to run Terraform in")
+	command.Flags().StringVarP(&moduleDir, "module-dir", "m", ".", "The module directory to run Terraform in")
 	command.Flags().BoolVarP(&skipBackendCheck, "skip-backend-check", "s", false, "Skip checking for changed backend configuration")
 	command.Flags().BoolVarP(&noVars, "no-vars", "n", false, `Don't add any variables when running Terraform.
 This is necessary when running 'terraform apply' with a plan file.`)
 	command.Flags().SetInterspersed(false)
 	command.SetVersionTemplate("{{ .Version }}\n")
 	command.SilenceUsage = true
-	if err := command.MarkFlagRequired("module-dir"); err != nil {
-		log.Fatalln(err)
-	}
 	return command
 }
