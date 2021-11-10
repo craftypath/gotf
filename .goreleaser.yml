@@ -41,3 +41,20 @@ brews:
     description: Handling multiple environments with Terraform made easy
     test: |
       system "#{bin}/gotf --version"
+dockers:
+  - goos: linux
+    goarch: amd64
+    dockerfile: Dockerfile
+    image_templates:
+      - ghcr.io/craftypath/gotf:{{ .Tag }}
+      - ghcr.io/craftypath/gotf:latest
+    build_flag_templates:
+      - --label=org.opencontainers.image.version={{ .Version }}
+      - --label=org.opencontainers.image.revision={{ .Commit }}
+      - --label=org.opencontainers.image.title={{ .ProjectName }}
+      - --label=org.opencontainers.image.created={{ .Date }}
+      - --label=org.opencontainers.image.description=gotf - Handling multiple environments with Terraform made easy
+      - --label=org.opencontainers.image.vendor=craftypath
+      - --label=org.opencontainers.image.licenses=Apache-2.0
+      - --label=org.opencontainers.image.source=https://github.com/craftypath/gotf
+      - --label=org.opencontainers.image.authors=The gotf Authors
