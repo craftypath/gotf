@@ -45,9 +45,17 @@ jobs:
         run: |
           mage -v test
 
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Release
         run: |
           echo "Building release ${{ github.event.inputs.version }}"
           mage -v release
         env:
-          GITHUB_TOKEN: "${{ secrets.CI_TOKEN }}"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
