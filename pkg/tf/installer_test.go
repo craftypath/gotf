@@ -15,7 +15,6 @@
 package terraform
 
 import (
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -56,12 +55,7 @@ kdbIIs9rDtIWEXh/SeiWWwyV+fzsWRMttw86f/GTrGuMiSz9bV3J6KBuf1ymd6OU
 `)
 
 func TestInstaller_Install(t *testing.T) {
-	dir, err := ioutil.TempDir("", "gotf")
-	if err != nil {
-		panic(err)
-	}
-	defer os.RemoveAll(dir)
-
+	dir := t.TempDir()
 	transport := &http.Transport{}
 	cwd, _ := os.Getwd()
 	transport.RegisterProtocol("file", http.NewFileTransport(http.Dir(cwd)))
@@ -75,7 +69,7 @@ func TestInstaller_Install(t *testing.T) {
 	installer := NewInstaller(urlTemplates, "0.42.0", [][]byte{testGPGPublicKey}, dir)
 	installer.httpClient = httpClient
 
-	err = installer.Install()
+	err := installer.Install()
 	assert.NoError(t, err)
 	assert.FileExists(t, filepath.Join(dir, "test.txt"))
 }
