@@ -116,7 +116,7 @@ If set to `true`, gotf checks whether configured variable files exist and does n
 ### Example
 
 ```yaml
-terraformVersion:  1.0.9
+terraformVersion:  1.1.5
 
 requiredParams:
   environment:
@@ -192,7 +192,7 @@ $ gotf -c example-config.yaml -p environment=dev -m 01_networking init
 After processing, the config file would look like this:
 
 ```yaml
-terraformVersion:  1.0.9
+terraformVersion:  1.1.5
 
 requiredParams:
   environment:

@@ -1,4 +1,4 @@
-terraformVersion: 0.14.5
+terraformVersion: 1.1.5
 
 ignoreMissingVarFiles: true
 

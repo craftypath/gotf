@@ -182,6 +182,7 @@ func maybeAppendValFile(cfg *Config, ignoreMissingVarFiles bool, varFilePath str
 			}
 		}
 	}
+
 	cfg.VarFiles = append(cfg.VarFiles, varFilePath)
 	return nil
 }
@@ -259,7 +260,7 @@ func computeValue(valueTemplate interface{}, params map[string]interface{}) (str
 
 func appendStringParams(dst map[string]interface{}, src map[string]string) error {
 	for k, v := range src {
-		if err := checkforModuleDirParam(k); err != nil {
+		if err := checkForModuleDirParam(k); err != nil {
 			return err
 		}
 		dst[k] = v
@@ -269,7 +270,7 @@ func appendStringParams(dst map[string]interface{}, src map[string]string) error
 
 func appendInterfaceParams(dst map[string]interface{}, src map[string]interface{}) error {
 	for k, v := range src {
-		if err := checkforModuleDirParam(k); err != nil {
+		if err := checkForModuleDirParam(k); err != nil {
 			return err
 		}
 		dst[k] = v
@@ -277,7 +278,7 @@ func appendInterfaceParams(dst map[string]interface{}, src map[string]interface{
 	return nil
 }
 
-func checkforModuleDirParam(key string) error {
+func checkForModuleDirParam(key string) error {
 	if key == moduleDirParamName {
 		return fmt.Errorf("param %q is reserved and set automatically", moduleDirParamName)
 	}
