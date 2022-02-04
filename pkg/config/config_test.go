@@ -48,7 +48,7 @@ func TestLoad(t *testing.T) {
 				},
 			},
 			want: &Config{
-				TerraformVersion: "0.14.5",
+				TerraformVersion: "1.1.5",
 				VarFiles: []string{
 					"../testdata/global.tfvars",
 					"../testdata/global-dev.tfvars",
@@ -88,7 +88,7 @@ func TestLoad(t *testing.T) {
 				},
 			},
 			want: &Config{
-				TerraformVersion: "0.14.5",
+				TerraformVersion: "1.1.5",
 				VarFiles: []string{
 					"../testdata/global.tfvars",
 					"../testdata/global-dev.tfvars",
@@ -128,7 +128,7 @@ func TestLoad(t *testing.T) {
 				},
 			},
 			want: &Config{
-				TerraformVersion: "0.14.5",
+				TerraformVersion: "1.1.5",
 				VarFiles: []string{
 					"../testdata/global.tfvars",
 					"../testdata/global-prod.tfvars",
@@ -168,7 +168,7 @@ func TestLoad(t *testing.T) {
 				},
 			},
 			want: &Config{
-				TerraformVersion: "0.14.5",
+				TerraformVersion: "1.1.5",
 				VarFiles: []string{
 					"../testdata/global.tfvars",
 					"../testdata/global-prod.tfvars",

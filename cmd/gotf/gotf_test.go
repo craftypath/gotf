@@ -53,7 +53,7 @@ func TestExecute(t *testing.T) {
 				{
 					args: []string{"-d", "-c", "testdata/test-config.yaml", "-p", "environment=prod", "-m", "testdata/01_networking", "apply", "-auto-approve", "-no-color"},
 					want: []string{
-						"State path: .terraform/terraform-networking-prod.tfstate",
+						".terraform/terraform-networking-prod.tfstate",
 						`bar = "module1_prod"
 envSpecificVar = "prodvalue"
 foo = "42"
@@ -92,7 +92,7 @@ myvar = "value for networking"
 				{
 					args: []string{"-d", "-c", "testdata/test-config.yaml", "-p", "environment=dev", "-m", "testdata/02_compute", "apply", "-auto-approve", "-no-color"},
 					want: []string{
-						"State path: .terraform/terraform-compute-dev.tfstate",
+						".terraform/terraform-compute-dev.tfstate",
 						`bar = "module2_dev"
 envSpecificVar = "devvalue"
 foo = "42"
@@ -169,8 +169,9 @@ myvar = "value for compute"
 				{
 					args: []string{"-d", "--skip-backend-check", "-c", "testdata/test-config.yaml", "-p", "environment=dev", "-m", "testdata/01_networking", "init", "-no-color"},
 					want: []string{
-						"Backend configuration changed!",
+						"Backend configuration changed",
 					},
+					wantErr: true,
 				},
 			},
 		},

@@ -1,4 +1,4 @@
-terraformVersion: 1.0.9
+terraformVersion: 1.1.5
 
 requiredParams:
   environment:
