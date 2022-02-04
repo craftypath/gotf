@@ -17,7 +17,6 @@ package gotf
 import (
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -197,14 +196,9 @@ myvar = "value for compute"
 			},
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tempDir, err := ioutil.TempDir("testdata", "gotf")
-			t.Cleanup(func() { os.RemoveAll(tempDir) })
-
-			panicOnError(err)
-			panicOnError(os.Setenv("XDG_CACHE_HOME", filepath.Join(tempDir, "tfcache")))
-
 			t.Cleanup(func() {
 				os.RemoveAll("testdata/01_networking/.terraform")
 				os.RemoveAll("testdata/01_networking/plan.out")
@@ -226,12 +220,6 @@ myvar = "value for compute"
 				}
 			}
 		})
-	}
-}
-
-func panicOnError(err error) {
-	if err != nil {
-		panic(err)
 	}
 }
 
