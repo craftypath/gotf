@@ -61,6 +61,7 @@ func TestLoad(t *testing.T) {
 					"mapvar":       "{\n  value1 = \"testvalue\"\n  value2 = true\n}",
 					"moduleVar1":   "testmodule1_value1",
 					"moduleVar2":   "testmodule1_value2",
+					"my_env":       "dev-env",
 				},
 				Envs: map[string]string{
 					"BAR":           "barvalue",
@@ -101,6 +102,7 @@ func TestLoad(t *testing.T) {
 					"mapvar":       "{\n  value1 = \"testvalue\"\n  value2 = true\n}",
 					"moduleVar1":   "testmodule2_value1",
 					"moduleVar2":   "testmodule2_value2",
+					"my_env":       "dev-env",
 				},
 				Envs: map[string]string{
 					"BAR":           "barvalue",
@@ -141,6 +143,7 @@ func TestLoad(t *testing.T) {
 					"mapvar":       "{\n  value1 = \"testvalue\"\n  value2 = true\n}",
 					"moduleVar1":   "testmodule1_value1",
 					"moduleVar2":   "testmodule1_value2",
+					"my_env":       "prod-env",
 				},
 				Envs: map[string]string{
 					"BAR":           "barvalue",
@@ -181,6 +184,7 @@ func TestLoad(t *testing.T) {
 					"mapvar":       "{\n  value1 = \"testvalue\"\n  value2 = true\n}",
 					"moduleVar1":   "testmodule2_value1",
 					"moduleVar2":   "testmodule2_value2",
+					"my_env":       "prod-env",
 				},
 				Envs: map[string]string{
 					"BAR":           "barvalue",

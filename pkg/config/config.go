@@ -24,6 +24,7 @@ import (
 	"text/template"
 
 	"github.com/Masterminds/sprig/v3"
+	"github.com/joho/godotenv"
 	"gopkg.in/yaml.v2"
 )
 
@@ -38,6 +39,7 @@ type fileConfig struct {
 	GlobalVars            map[string]interface{}            `yaml:"globalVars"`
 	ModuleVars            map[string]map[string]interface{} `yaml:"moduleVars"`
 	Envs                  map[string]string                 `yaml:"envs"`
+	VarsFromEnvFiles      []string                          `yaml:"varsFromEnvFiles"`
 	BackendConfigs        map[string]string                 `yaml:"backendConfigs"`
 	IgnoreMissingVarFiles bool                              `yaml:"ignoreMissingVarFiles"`
 }
@@ -94,9 +96,8 @@ func Load(configFile string, modulePath string, cliParams map[string]string) (*C
 		BackendConfigs:   make(map[string]string),
 	}
 
-	log.Println("Processing global var files...")
 	for _, f := range fileCfg.GlobalVarFiles {
-		varFilePath, err := computeModuleRelativeVarFilePath(f, params, cfgFileDir, modulePath)
+		varFilePath, err := computeModuleRelativePath(f, params, cfgFileDir, modulePath)
 		if err != nil {
 			return nil, err
 		}
@@ -105,17 +106,26 @@ func Load(configFile string, modulePath string, cliParams map[string]string) (*C
 		}
 	}
 
+	log.Println("Processing module var files...")
 	moduleDir := params[moduleDirParamName].(string)
-	if moduleVarFiles, ok := fileCfg.ModuleVarFiles[moduleDir]; ok {
-		log.Println("Processing module var files...")
-		for _, f := range moduleVarFiles {
-			varFilePath, err := computeModuleRelativeVarFilePath(f, params, cfgFileDir, modulePath)
-			if err != nil {
-				return nil, err
-			}
-			if err := maybeAppendValFile(cfg, fileCfg.IgnoreMissingVarFiles, varFilePath, modulePath); err != nil {
-				return nil, err
-			}
+	for _, f := range fileCfg.ModuleVarFiles[moduleDir] {
+		varFilePath, err := computeModuleRelativePath(f, params, cfgFileDir, modulePath)
+		if err != nil {
+			return nil, err
+		}
+		if err := maybeAppendValFile(cfg, fileCfg.IgnoreMissingVarFiles, varFilePath, modulePath); err != nil {
+			return nil, err
+		}
+	}
+
+	log.Println("Processing vars from env files...")
+	for _, f := range fileCfg.VarsFromEnvFiles {
+		path, err := computeModuleRelativePath(f, params, cfgFileDir, modulePath)
+		if err != nil {
+			return nil, err
+		}
+		if err := maybeAppendVarsFromEnvFile(cfg, fileCfg.IgnoreMissingVarFiles, path, modulePath); err != nil {
+			return nil, err
 		}
 	}
 
@@ -128,15 +138,13 @@ func Load(configFile string, modulePath string, cliParams map[string]string) (*C
 		cfg.Vars[key] = result
 	}
 
-	if moduleVars, ok := fileCfg.ModuleVars[moduleDir]; ok {
-		log.Println("Processing module vars...")
-		for key, value := range moduleVars {
-			result, err := computeValue(value, params)
-			if err != nil {
-				return nil, err
-			}
-			cfg.Vars[key] = result
+	log.Println("Processing module vars...")
+	for key, value := range fileCfg.ModuleVars[moduleDir] {
+		result, err := computeValue(value, params)
+		if err != nil {
+			return nil, err
 		}
+		cfg.Vars[key] = result
 	}
 
 	log.Println("Processing envs...")
@@ -187,6 +195,34 @@ func maybeAppendValFile(cfg *Config, ignoreMissingVarFiles bool, varFilePath str
 	return nil
 }
 
+func maybeAppendVarsFromEnvFile(cfg *Config, IgnoreMissingVarFiles bool, varFilePath string, modulePath string) error {
+	var path string
+	if filepath.IsAbs(varFilePath) {
+		path = varFilePath
+	} else {
+		path = filepath.Join(modulePath, varFilePath)
+	}
+
+	if IgnoreMissingVarFiles {
+		_, err := os.Stat(path)
+		if err != nil {
+			if os.IsNotExist(err) {
+				log.Println(fmt.Sprintf("File %s does not exist. Ignoring it.", path))
+				return nil
+			}
+		}
+	}
+
+	envs, err := godotenv.Read(path)
+	if err != nil {
+		return err
+	}
+	for key, value := range envs {
+		cfg.Vars[strings.ToLower(key)] = value
+	}
+	return nil
+}
+
 func checkRequiredParams(fileCfg *fileConfig, cliParams map[string]string) error {
 	for k, v := range fileCfg.RequiredParams {
 		value, ok := cliParams[k]
@@ -230,22 +266,22 @@ func renderTemplate(data map[string]interface{}, tmpl string) (string, error) {
 	return wr.String(), nil
 }
 
-func computeModuleRelativeVarFilePath(varFilePathTemplate string, params map[string]interface{}, cfgFileDir string, modulePath string) (string, error) {
+func computeModuleRelativePath(pathTemplate string, params map[string]interface{}, cfgFileDir string, modulePath string) (string, error) {
 	templatingInput := map[string]interface{}{
 		"Params": params,
 	}
-	varFilePath, err := renderTemplate(templatingInput, varFilePathTemplate)
+	path, err := renderTemplate(templatingInput, pathTemplate)
 	if err != nil {
 		return "", err
 	}
-	if !filepath.IsAbs(varFilePath) {
-		varFilePath := filepath.Join(cfgFileDir, varFilePath)
+	if !filepath.IsAbs(path) {
+		varFilePath := filepath.Join(cfgFileDir, path)
 		if varFilePath, err = filepath.Rel(modulePath, varFilePath); err != nil {
 			return "", err
 		}
 		return varFilePath, nil
 	}
-	return varFilePath, nil
+	return path, nil
 }
 
 func computeValue(valueTemplate interface{}, params map[string]interface{}) (string, error) {

@@ -45,6 +45,9 @@ moduleVars:
   02_compute:
     myvar: value for compute
 
+varsFromEnvFiles:
+  - '{{ .Params.environment }}.env'
+
 envs:
   BAR: barvalue
   TEMPLATED_ENV: "{{ .Params.param }}"

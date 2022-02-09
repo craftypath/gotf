@@ -38,7 +38,7 @@ brews:
       name: craftypath-ci-bot
       email: craftypath-ci-bot@users.noreply.github.com
     folder: Formula
-    homepage:  https://github.com/craftypath/gotf/
+    homepage: https://github.com/craftypath/gotf/
     description: Handling multiple environments with Terraform made easy
     install: |
       bin.install "gotf"

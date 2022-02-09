@@ -41,6 +41,9 @@ globalVars:
       value2 = true
     }
 
+varsFromEnvFiles:
+  - '{{ .Params.environment }}.env'
+
 envs:
   BAR: barvalue
   TEMPLATED_ENV: "{{ .Params.param }}"

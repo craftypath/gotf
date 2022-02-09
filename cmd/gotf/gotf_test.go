@@ -54,9 +54,9 @@ func TestExecute(t *testing.T) {
 					want: []string{
 						".terraform/terraform-networking-prod.tfstate",
 						`bar = "module1_prod"
-envSpecificVar = "prodvalue"
+env_specific_var = "prodvalue"
 foo = "42"
-globalVar = "globalvalue"
+global_var = "globalvalue"
 mapvar = <<EOT
 {
   entry1 = {
@@ -70,6 +70,7 @@ mapvar = <<EOT
 }
 EOT
 myvar = "value for networking"
+var_from_env_file = "prod-env"
 `},
 				},
 			},
@@ -93,9 +94,9 @@ myvar = "value for networking"
 					want: []string{
 						".terraform/terraform-compute-dev.tfstate",
 						`bar = "module2_dev"
-envSpecificVar = "devvalue"
+env_specific_var = "devvalue"
 foo = "42"
-globalVar = "globalvalue"
+global_var = "globalvalue"
 mapvar = <<EOT
 {
   entry1 = {
@@ -109,6 +110,7 @@ mapvar = <<EOT
 }
 EOT
 myvar = "value for compute"
+var_from_env_file = "dev-env"
 `},
 				},
 			},
