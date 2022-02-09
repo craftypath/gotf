@@ -10,5 +10,5 @@ variable "use_special_chars" {
 
 variable "module_specific_messages" {
   description = "Messages to print to the console"
-  type = list(string)
+  type        = list(string)
 }

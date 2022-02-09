@@ -1,1 +1,1 @@
-envSpecificVar = "prodvalue"
+env_specific_var = "prodvalue"

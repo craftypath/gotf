@@ -101,6 +101,31 @@ Variables which are added to the Terraform environment via `TF_VAR_<var>=value` 
 Module-specific variables which are added to the Terraform environment if the corresponding module is run via `TF_VAR_<var>=value` for commands that support them.
 Module-specific variables override global ones.
 
+#### `varsFromEnvFiles`
+
+Allows variables to be configured as env files (`name=value` per line) which can also be sourced from a shell script.
+`gotf` interprets these files and passes each entry via `TF_VAR_` environment variable.
+Names are automatically lower-cased to match the common Terraform style.
+This feature can be quite convenient if you create parts of your infrastructure via Terraform and other parts via shell scripts
+but want to have a common source for shared variables.
+This is also a workaround for getting rid of Terraform warnings in case a variable is not declared, which might happen if you use global var files for different modules.
+Comments and variable expansion are supported.
+
+```shell
+# comment for FOO
+FOO=foo
+
+# comment for BAR
+BAR="bar is just a $FOO"
+```
+
+This would then be set as follows:
+
+```shell
+TF_VAR_foo=foo
+TV_VAR_bar="bar is just a foo"
+```
+
 #### `envs`
 
 Environment variables to be added to the Terraform process.
@@ -158,6 +183,9 @@ moduleVars:
     myvar: value for networking
   02_compute:
     myvar: value for compute
+
+varsFromEnvFiles:
+  - '{{ .Params.environment }}.env'
 
 envs:
   BAR: barvalue
@@ -254,31 +282,32 @@ For example, the integration test in [cmd/gotf/gotf_test.go](cmd/gotf/gotf_test.
 ```console
 gotf> Loading config file: testdata/test-config.yaml
 gotf> Processing var files...
-gotf> Processing global var files...
+gotf> File testdata/global-does-not-exists.tfvars does not exist. Ignoring it.
 gotf> Processing module var files...
+gotf> Processing vars from env files...
 gotf> Processing global vars...
 gotf> Processing module vars...
 gotf> Processing envs...
 gotf> Processing backend configs...
-gotf> Using Terraform version 1.0.9
-gotf> Terraform version 1.0.9 already installed.
-gotf> Terraform binary: /Users/myuser/Library/Caches/gotf/terraform/1.0.9/terraform
+gotf> Using Terraform version 1.1.5
+gotf> Terraform version 1.1.5 already installed.
+gotf> Terraform binary: /Users/myuser/Library/Caches/gotf/terraform/1.1.5/terraform
 gotf>
 gotf> Terraform command-line:
 gotf> -----------------------
-gotf> /Users/myuser/Library/Caches/gotf/terraform/1.0.9/terraform init -no-color
+gotf> /Users/myuser/Library/Caches/gotf/terraform/1.1.5/terraform apply -auto-approve -no-color
 gotf>
 gotf> Terraform environment:
 gotf> ----------------------
-gotf> TF_CLI_ARGS_destroy=-var-file="../global-prod.tfvars" -var-file="../global.tfvars" -var-file="prod.tfvars"
-gotf> TF_VAR_templated_var=myval
-gotf> BAR=barvalue
-gotf> TF_CLI_ARGS_apply=-var-file="../global-prod.tfvars" -var-file="../global.tfvars" -var-file="prod.tfvars"
-gotf> TF_VAR_state_key=networking
-gotf> TF_VAR_myvar=value for networking
-gotf> TF_CLI_ARGS_plan=-var-file="../global-prod.tfvars" -var-file="../global.tfvars" -var-file="prod.tfvars"
 gotf> TF_CLI_ARGS_import=-var-file="../global-prod.tfvars" -var-file="../global.tfvars" -var-file="prod.tfvars"
+gotf> TF_CLI_ARGS_init=-backend-config=path=".terraform/terraform-networking-prod.tfstate"
+gotf> TEMPLATED_ENV=myval
+gotf> TF_CLI_ARGS_plan=-var-file="../global-prod.tfvars" -var-file="../global.tfvars" -var-file="prod.tfvars"
+gotf> TF_VAR_myvar=value for networking
+gotf> TF_CLI_ARGS_apply=-var-file="../global-prod.tfvars" -var-file="../global.tfvars" -var-file="prod.tfvars"
+gotf> TF_CLI_ARGS_refresh=-var-file="../global-prod.tfvars" -var-file="../global.tfvars" -var-file="prod.tfvars"
 gotf> TF_VAR_foo=42
+gotf> TF_VAR_var_from_env_file=prod-env
 gotf> TF_VAR_mapvar={
   entry1 = {
     value1 = testvalue1
@@ -289,8 +318,9 @@ gotf> TF_VAR_mapvar={
     value2 = false
   }
 }
+gotf> TF_VAR_state_key=networking
+gotf> BAR=barvalue
+gotf> TF_CLI_ARGS_destroy=-var-file="../global-prod.tfvars" -var-file="../global.tfvars" -var-file="prod.tfvars"
+gotf> TF_VAR_templated_var=myval
 gotf> TF_VAR_module_dir=01_networking
-gotf> TF_CLI_ARGS_init=-backend-config=path=".terraform/terraform-networking-prod.tfstate"
-gotf> TEMPLATED_ENV=myval
-gotf> TF_CLI_ARGS_refresh=-var-file="../global-prod.tfvars" -var-file="../global.tfvars" -var-file="prod.tfvars"
 ```
