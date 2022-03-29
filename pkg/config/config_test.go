@@ -67,7 +67,7 @@ func TestLoad(t *testing.T) {
 					"BAR":           "barvalue",
 					"TEMPLATED_ENV": "paramvalue",
 				},
-				BackendConfigs: map[string]string{
+				BackendConfigs: map[string]interface{}{
 					"key":                  "testmodule1",
 					"storage_account_name": "mytfstateaccountdev",
 					"resource_group_name":  "mytfstate-dev",
@@ -108,7 +108,7 @@ func TestLoad(t *testing.T) {
 					"BAR":           "barvalue",
 					"TEMPLATED_ENV": "paramvalue",
 				},
-				BackendConfigs: map[string]string{
+				BackendConfigs: map[string]interface{}{
 					"key":                  "testmodule2",
 					"storage_account_name": "mytfstateaccountdev",
 					"resource_group_name":  "mytfstate-dev",
@@ -149,7 +149,7 @@ func TestLoad(t *testing.T) {
 					"BAR":           "barvalue",
 					"TEMPLATED_ENV": "paramvalue",
 				},
-				BackendConfigs: map[string]string{
+				BackendConfigs: map[string]interface{}{
 					"key":                  "testmodule1",
 					"storage_account_name": "mytfstateaccountprod",
 					"resource_group_name":  "mytfstate-prod",
@@ -190,7 +190,7 @@ func TestLoad(t *testing.T) {
 					"BAR":           "barvalue",
 					"TEMPLATED_ENV": "paramvalue",
 				},
-				BackendConfigs: map[string]string{
+				BackendConfigs: map[string]interface{}{
 					"key":                  "testmodule2",
 					"storage_account_name": "mytfstateaccountprod",
 					"resource_group_name":  "mytfstate-prod",
