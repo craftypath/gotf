@@ -103,7 +103,7 @@ func (tf *Terraform) appendBackendConfigs(env map[string]string) {
 			if sb.Len() > 0 {
 				sb.WriteString(" ")
 			}
-			sb.WriteString(fmt.Sprintf("-backend-config=%s=%q", k, v))
+			sb.WriteString(fmt.Sprintf("-backend-config=%s='%v'", k, v))
 		}
 		env["TF_CLI_ARGS_init"] = sb.String()
 	}

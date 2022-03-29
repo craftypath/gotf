@@ -40,7 +40,7 @@ type fileConfig struct {
 	ModuleVars            map[string]map[string]interface{} `yaml:"moduleVars"`
 	Envs                  map[string]string                 `yaml:"envs"`
 	VarsFromEnvFiles      []string                          `yaml:"varsFromEnvFiles"`
-	BackendConfigs        map[string]string                 `yaml:"backendConfigs"`
+	BackendConfigs        map[string]interface{}            `yaml:"backendConfigs"`
 	IgnoreMissingVarFiles bool                              `yaml:"ignoreMissingVarFiles"`
 }
 
@@ -49,7 +49,7 @@ type Config struct {
 	VarFiles         []string
 	Vars             map[string]string
 	Envs             map[string]string
-	BackendConfigs   map[string]string
+	BackendConfigs   map[string]interface{}
 }
 
 const moduleDirParamName = "moduleDir"
@@ -93,7 +93,7 @@ func Load(configFile string, modulePath string, cliParams map[string]string) (*C
 		VarFiles:         []string{},
 		Vars:             make(map[string]string),
 		Envs:             make(map[string]string),
-		BackendConfigs:   make(map[string]string),
+		BackendConfigs:   make(map[string]interface{}),
 	}
 
 	for _, f := range fileCfg.GlobalVarFiles {
@@ -163,10 +163,14 @@ func Load(configFile string, modulePath string, cliParams map[string]string) (*C
 	}
 
 	log.Println("Processing backend configs...")
-	for key, value := range fileCfg.BackendConfigs {
-		result, err := renderTemplate(templatingInput, value)
-		if err != nil {
-			return nil, err
+	for key, valueTemplate := range fileCfg.BackendConfigs {
+		var result interface{}
+		if tmpl, ok := valueTemplate.(string); ok {
+			if result, err = renderTemplate(templatingInput, tmpl); err != nil {
+				return nil, err
+			}
+		} else {
+			result = valueTemplate
 		}
 		cfg.BackendConfigs[key] = result
 	}
