@@ -129,14 +129,14 @@ func (tf *Terraform) checkBackendConfig(args ...string) error {
 		return err
 	}
 
-	var backendJson map[string]interface{}
-	if err := json.Unmarshal(b, &backendJson); err != nil {
+	var backendJSON map[string]interface{}
+	if err := json.Unmarshal(b, &backendJSON); err != nil {
 		return err
 	}
 
 	sb := strings.Builder{}
 	for k, v := range tf.config.BackendConfigs {
-		b := backendJson["backend"].(map[string]interface{})
+		b := backendJSON["backend"].(map[string]interface{})
 		c := b["config"].(map[string]interface{})
 		currentVal := c[k]
 		if v != currentVal {
