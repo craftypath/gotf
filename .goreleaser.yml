@@ -1,6 +1,5 @@
-before:
-  hooks:
-    - go mod download
+version: 2
+
 builds:
   - main: main.go
     binary: gotf
@@ -30,14 +29,14 @@ archives:
       - LICENSE
       - README.md
 brews:
-  - tap:
+  - repository:
       owner: craftypath
       name: homebrew-tap
       token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
     commit_author:
       name: craftypath-ci-bot
       email: craftypath-ci-bot@users.noreply.github.com
-    folder: Formula
+    directory: Formula
     homepage: https://github.com/craftypath/gotf/
     description: Handling multiple environments with Terraform made easy
     install: |

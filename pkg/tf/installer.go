@@ -28,7 +28,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"runtime"
 	"strings"
 
 	"github.com/hashicorp/go-multierror"
@@ -61,13 +60,13 @@ func NewInstaller(urlTemplates *URLTemplates, version string, gpgPublicKeys [][]
 	}
 }
 
-func (i *Installer) Install() error {
+func (i *Installer) Install(goos string, goarch string) error {
 	if err := os.MkdirAll(i.dstDir, os.ModePerm); err != nil {
 		return fmt.Errorf("could not create installation directory: %w", err)
 	}
 
 	log.Println("Downloading Terraform distro...")
-	url := fmt.Sprintf(i.urlTemplates.TargetFile, i.version, runtime.GOOS, runtime.GOARCH)
+	url := fmt.Sprintf(i.urlTemplates.TargetFile, i.version, goos, goarch)
 	targetFilePath, err := i.download(url)
 	if err != nil {
 		return fmt.Errorf("could download Terraform distro: %w", err)
@@ -84,7 +83,7 @@ func (i *Installer) Install() error {
 	url = fmt.Sprintf(i.urlTemplates.SHA256SumsSignatureFile, i.version)
 	sha256sumsSignatureFilePath, err := i.download(url)
 	if err != nil {
-		return fmt.Errorf("could download SHA256 sums signature file: %w", err)
+		return fmt.Errorf("could not download SHA256 sums signature file: %w", err)
 	}
 
 	log.Println("Verifying GPG signature...")

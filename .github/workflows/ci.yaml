@@ -11,26 +11,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Setup Go
-        uses: actions/setup-go@v2
+      - name: Setup go
+        uses: actions/setup-go@v5
         with:
-          go-version: 1.18
+          go-version: 1.24
 
-      - uses: actions/cache@v2
+      - name: Install Mage
+        uses: magefile/mage-action@v3
+        with:
+          install-only: true
+
+      - uses: actions/cache@v4
         with:
           path: ~/go/pkg/mod
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
-
-      - name: Install tools
-        run: |
-          ./setup.sh
-          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
 
       - name: Check License Headers
         run: mage -v checkLicenseHeaders

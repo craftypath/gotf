@@ -69,7 +69,7 @@ func TestInstaller_Install(t *testing.T) {
 	installer := NewInstaller(urlTemplates, "0.42.0", [][]byte{testGPGPublicKey}, dir)
 	installer.httpClient = httpClient
 
-	err := installer.Install()
+	err := installer.Install("linux", "amd64")
 	assert.NoError(t, err)
 	assert.FileExists(t, filepath.Join(dir, "test.txt"))
 }
