@@ -21,6 +21,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"runtime"
 
 	"github.com/adrg/xdg"
 
@@ -88,7 +89,7 @@ func Run(args Args) error {
 		if _, err := os.Stat(tfBinary); err != nil {
 			if os.IsNotExist(err) {
 				installer := terraform.NewInstaller(urlTemplates, cfg.TerraformVersion, [][]byte{hashicorpPGPKeyNew, hashicorpPGPKeyOld}, cacheDir)
-				if err = installer.Install(); err != nil {
+				if err = installer.Install(runtime.GOOS, runtime.GOARCH); err != nil {
 					return err
 				}
 			} else {

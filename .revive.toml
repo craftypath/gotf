@@ -1,0 +1,28 @@
+ignoreGeneratedHeader = true
+severity = "error"
+confidence = 0.8
+errorCode = 1
+warningCode = 0
+
+[directive.specify-disable-reason]
+severity = "error"
+
+[rule.context-as-argument]
+[rule.context-keys-type]
+[rule.dot-imports]
+[rule.empty-block]
+[rule.error-naming]
+[rule.error-return]
+[rule.error-strings]
+[rule.errorf]
+[rule.increment-decrement]
+[rule.range]
+[rule.receiver-naming]
+[rule.redefines-builtin-id]
+[rule.superfluous-else]
+[rule.time-naming]
+[rule.unexported-return]
+[rule.unreachable-code]
+[rule.unused-parameter]
+[rule.var-declaration]
+[rule.var-naming]

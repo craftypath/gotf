@@ -59,7 +59,7 @@ func newGotfCommand() *cobra.Command {
 gotf is a Terraform wrapper facilitating configurations for various environments
 `, fullVersion),
 		Version: fullVersion,
-		RunE: func(command *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, args []string) error {
 			return gotf.Run(gotf.Args{
 				Debug:            debug,
 				ConfigFile:       cfgFile,
